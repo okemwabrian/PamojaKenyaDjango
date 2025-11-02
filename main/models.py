@@ -61,16 +61,19 @@ class Payment(models.Model):
     PAYMENT_TYPES = [
         ('activation_fee', 'Activation Fee'),
         ('membership_single', 'Single Membership - $200'),
-        ('membership_double', 'Double Membership - $400'),
+        ('membership_double', 'Double Membership - $200'),
         ('shares', 'Share Purchase'),
         ('other', 'Other'),
     ]
     
     PAYMENT_METHODS = [
+        ('paypal', 'PayPal'),
+        ('venmo', 'Venmo'),
+        ('zelle', 'Zelle'),
+        ('debit_card', 'Debit Card'),
+        ('credit_card', 'Credit Card'),
         ('bank_transfer', 'Bank Transfer'),
-        ('mobile_money', 'Mobile Money'),
         ('cash', 'Cash'),
-        ('check', 'Check'),
     ]
     
     STATUS_CHOICES = [
@@ -280,3 +283,29 @@ class Message(models.Model):
     
     def __str__(self):
         return f"{self.sender.username} to {self.recipient.username}: {self.subject}"
+
+class MembershipUpgrade(models.Model):
+    UPGRADE_TYPES = [
+        ('single_to_double', 'Single to Double'),
+        ('double_to_single', 'Double to Single'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    current_membership = models.CharField(max_length=10)
+    requested_membership = models.CharField(max_length=10)
+    upgrade_type = models.CharField(max_length=20, choices=UPGRADE_TYPES)
+    reason = models.TextField()
+    
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    admin_notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.upgrade_type}"

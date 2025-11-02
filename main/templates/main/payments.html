@@ -36,7 +36,7 @@
                                 <select class="form-select" name="payment_type" required onchange="updateAmount(this)">
                                     <option value="activation_fee">Activation Fee</option>
                                     <option value="membership_single">Single Membership - $200</option>
-                                    <option value="membership_double">Double Membership - $400</option>
+                                    <option value="membership_double">Double Membership - $200</option>
                                     <option value="shares">Share Purchase</option>
                                     <option value="other">Other</option>
                                 </select>
@@ -51,10 +51,13 @@
                                 <label class="form-label">Payment Method *</label>
                                 <select class="form-select" name="payment_method" required onchange="showInstructions(this)">
                                     <option value="">Select method...</option>
+                                    <option value="paypal">PayPal</option>
+                                    <option value="venmo">Venmo</option>
+                                    <option value="zelle">Zelle</option>
+                                    <option value="debit_card">Debit Card</option>
+                                    <option value="credit_card">Credit Card</option>
                                     <option value="bank_transfer">Bank Transfer</option>
-                                    <option value="mobile_money">Mobile Money</option>
                                     <option value="cash">Cash</option>
-                                    <option value="check">Check</option>
                                 </select>
                             </div>
                             
@@ -162,7 +165,7 @@ function updateAmount(select) {
     const amounts = {
         'activation_fee': '50',
         'membership_single': '200',
-        'membership_double': '400',
+        'membership_double': '200',
         'shares': '20',
         'other': ''
     };
@@ -174,10 +177,13 @@ function showInstructions(select) {
     const content = document.getElementById('instructionContent');
     
     const methods = {
-        'bank_transfer': 'Bank: Wells Fargo<br>Account: 1234567890<br>Routing: 121000248',
-        'mobile_money': 'M-Pesa: +1-555-0123<br>Zelle: pamoja@email.com',
-        'cash': 'Contact admin for cash payment arrangements',
-        'check': 'Make check payable to: Pamoja Kenya MN<br>Mail to: 123 Main St, Minneapolis, MN 55401'
+        'paypal': 'PayPal: pamojakeny@gmail.com<br>Send as Friends & Family to avoid fees',
+        'venmo': 'Venmo: @PamojaKenya<br>Include your name in the note',
+        'zelle': 'Zelle: pamojakeny@gmail.com<br>Use your registered name',
+        'debit_card': 'Contact admin for secure card processing<br>Email: pamojakeny@gmail.com',
+        'credit_card': 'Contact admin for secure card processing<br>Email: pamojakeny@gmail.com',
+        'bank_transfer': 'Bank: Wells Fargo<br>Account: Contact admin for details<br>Email: pamojakeny@gmail.com',
+        'cash': 'Contact admin for cash payment arrangements<br>Email: pamojakeny@gmail.com'
     };
     
     if (select.value && methods[select.value]) {

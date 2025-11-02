@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top py-2" style="background: linear-gradient(135deg, #1B3C53, #234C6A); box-shadow: 0 4px 15px rgba(27, 60, 83, 0.3);">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container">
         <a class="navbar-brand fw-bold" href="{% if user.is_authenticated %}{% url 'home_page' %}{% else %}{% url 'home' %}{% endif %}">
-            <img src="/static/images/logo.png" alt="Pamoja Kenya" height="30" class="me-2">
+            <img src="/static/images/logo.png" alt="Pamoja Kenya" class="me-1">
             Pamoja Kenya MN
         </a>
         

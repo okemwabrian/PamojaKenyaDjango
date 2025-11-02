@@ -8,60 +8,274 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        /* Responsive utilities */
-        .table-responsive {
-            font-size: 0.875rem;
+        /* Color Palette Variables */
+        :root {
+            --primary-blue: #0046FF;
+            --light-blue: #73C8D2;
+            --cream: #F5F1DC;
+            --orange: #FF9013;
+        }
+        
+        /* Global Styling */
+        body {
+            background-color: var(--cream);
+            padding-top: 40px !important;
+        }
+        
+        /* Ultra compact navbar */
+        .navbar {
+            min-height: 40px;
+            padding: 0.1rem 0;
+            background: linear-gradient(135deg, var(--primary-blue), var(--light-blue)) !important;
+        }
+        
+        .navbar-brand {
+            font-size: 0.9rem;
+            padding: 0.1rem 0;
+            margin-right: 0.5rem;
+            color: white !important;
+        }
+        
+        .navbar-brand img {
+            height: 20px !important;
+        }
+        
+        .nav-link {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            color: white !important;
+        }
+        
+        .nav-link:hover {
+            color: var(--cream) !important;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        
+        .navbar-toggler {
+            padding: 0.1rem 0.3rem;
+            font-size: 0.8rem;
+            border-color: rgba(255,255,255,0.3);
+        }
+        
+        .dropdown-menu {
+            font-size: 0.8rem;
+            background-color: white;
+            border: 1px solid var(--light-blue);
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--light-blue);
+            color: white;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--light-blue);
+            border-color: var(--light-blue);
+        }
+        
+        .btn-warning {
+            background-color: var(--orange);
+            border-color: var(--orange);
+        }
+        
+        .btn-info {
+            background-color: var(--light-blue);
+            border-color: var(--light-blue);
+        }
+        
+        /* Cards */
+        .card {
+            border: 1px solid var(--light-blue);
+            background-color: white;
+        }
+        
+        .card-header {
+            background-color: var(--light-blue);
+            color: white;
+            border-bottom: 1px solid var(--primary-blue);
+        }
+        
+        /* Forms */
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(0, 70, 255, 0.25);
+        }
+        
+        .form-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(0, 70, 255, 0.25);
+        }
+        
+        /* Alerts */
+        .alert-info {
+            background-color: rgba(115, 200, 210, 0.1);
+            border-color: var(--light-blue);
+            color: var(--primary-blue);
+        }
+        
+        /* Tables */
+        .table th {
+            background-color: var(--light-blue);
+            color: white;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(115, 200, 210, 0.1);
+        }
+        
+        /* Links */
+        a {
+            color: var(--primary-blue);
+        }
+        
+        a:hover {
+            color: var(--orange);
+        }
+        
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 0.8rem;
+            }
+            .navbar-brand img {
+                height: 18px !important;
+            }
+            .nav-link {
+                font-size: 0.75rem;
+                padding: 0.15rem 0.4rem;
+            }
         }
         
         @media (max-width: 576px) {
+            .navbar {
+                min-height: 35px;
+            }
+            .navbar-brand {
+                font-size: 0.75rem;
+            }
+            .navbar-brand img {
+                height: 16px !important;
+            }
+            .nav-link {
+                font-size: 0.7rem;
+                padding: 0.1rem 0.3rem;
+            }
+            body {
+                padding-top: 35px !important;
+            }
+        }
+        
+        /* Full responsive design */
+        .container-fluid {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        
+        .card {
+            margin-bottom: 0.5rem;
+        }
+        
+        .btn {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
+        }
+        
+        .table-responsive {
+            font-size: 0.8rem;
+        }
+        
+        @media (max-width: 992px) {
             .container {
-                padding-left: 10px;
-                padding-right: 10px;
+                padding-left: 8px;
+                padding-right: 8px;
             }
-            
-            .card {
-                margin-bottom: 1rem;
+            .card-body {
+                padding: 0.8rem;
             }
-            
-            .btn-group .btn {
+            .btn {
                 font-size: 0.75rem;
                 padding: 0.25rem 0.5rem;
-            }
-            
-            .table th, .table td {
-                padding: 0.5rem 0.25rem;
-                font-size: 0.75rem;
-            }
-            
-            .badge {
-                font-size: 0.65rem;
             }
         }
         
         @media (max-width: 768px) {
-            .display-4 {
-                font-size: 2rem;
+            .container {
+                padding-left: 6px;
+                padding-right: 6px;
             }
-            
+            .display-4 {
+                font-size: 1.8rem;
+            }
             .card-body {
-                padding: 1rem;
+                padding: 0.6rem;
+            }
+            .btn {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.4rem;
+            }
+            .table th, .table td {
+                padding: 0.3rem 0.2rem;
+                font-size: 0.7rem;
             }
         }
         
-        /* Ensure images are responsive */
+        @media (max-width: 576px) {
+            .container {
+                padding-left: 4px;
+                padding-right: 4px;
+            }
+            .card {
+                margin-bottom: 0.3rem;
+            }
+            .card-body {
+                padding: 0.5rem;
+            }
+            .btn {
+                font-size: 0.65rem;
+                padding: 0.15rem 0.3rem;
+            }
+            .table th, .table td {
+                padding: 0.2rem 0.1rem;
+                font-size: 0.65rem;
+            }
+            .badge {
+                font-size: 0.6rem;
+            }
+            .display-4 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* Responsive images and text */
         img {
             max-width: 100%;
             height: auto;
         }
         
-        /* Responsive text */
         .text-responsive {
-            font-size: clamp(0.875rem, 2.5vw, 1rem);
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+        }
+        
+        /* Mobile-first responsive typography */
+        h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); }
+        h2 { font-size: clamp(1.3rem, 3.5vw, 2rem); }
+        h3 { font-size: clamp(1.1rem, 3vw, 1.75rem); }
+        h4 { font-size: clamp(1rem, 2.5vw, 1.5rem); }
+        h5 { font-size: clamp(0.9rem, 2vw, 1.25rem); }
+        
+        p, .card-text {
+            font-size: clamp(0.8rem, 2vw, 1rem);
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body style="padding-top: 60px;">
+<body>
     {% include 'main/navbar.html' %}
     
     {% block content %}{% endblock %}

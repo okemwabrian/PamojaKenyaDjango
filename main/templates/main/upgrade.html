@@ -1,10 +1,10 @@
 {% extends 'main/base.html' %}
 
-{% block title %}Upgrade Membership - Pamoja Kenya MN{% endblock %}
+{% block title %}Membership Upgrade - Pamoja Kenya MN{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h2 class="text-center mb-4">🔄 Upgrade Membership</h2>
+<div class="container py-3">
+    <h2 class="text-center mb-3">🔄 Membership Upgrade</h2>
     
     {% if messages %}
         {% for message in messages %}
@@ -15,66 +15,83 @@
         {% endfor %}
     {% endif %}
 
-    <div class="row justify-content-center">
+    <div class="row">
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Upgrade to Double Family Membership</h5>
-                    <p class="text-muted">Expand your coverage to include extended family members.</p>
+                    <h5 class="card-title">Request Membership Change</h5>
+                    <p class="text-muted">Current: {{ current_membership|title }} Membership</p>
                     
+                    {% if current_membership != 'None' %}
                     <form method="post" class="row g-3">
                         {% csrf_token %}
                         <div class="col-md-6">
                             <label class="form-label">Current Membership</label>
-                            <select class="form-select" name="current_membership" readonly>
-                                <option value="single">Single Family</option>
-                            </select>
+                            <input type="text" class="form-control" value="{{ current_membership|title }}" readonly>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Upgrade To</label>
-                            <select class="form-select" name="upgrade_to" readonly>
-                                <option value="double">Double Family</option>
+                            <label class="form-label">Change To</label>
+                            <select class="form-select" name="requested_membership" required>
+                                <option value="">Select new membership type</option>
+                                {% if current_membership == 'single' %}
+                                <option value="double">Double Family ($200)</option>
+                                {% elif current_membership == 'double' %}
+                                <option value="single">Single Family ($200)</option>
+                                {% endif %}
                             </select>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Additional Family Members</label>
-                            <textarea class="form-control" rows="3" name="additional_members" 
-                                      placeholder="List additional family members to be covered..."></textarea>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Reason for Upgrade</label>
-                            <textarea class="form-control" rows="3" name="reason" 
-                                      placeholder="Please explain why you want to upgrade..."></textarea>
+                            <label class="form-label">Reason for Change</label>
+                            <textarea class="form-control" rows="3" name="reason" required
+                                      placeholder="Please explain why you want to change your membership type..."></textarea>
                         </div>
                         
                         <div class="col-12">
                             <div class="card bg-light">
                                 <div class="card-body">
-                                    <h6>Upgrade Summary</h6>
-                                    <div class="d-flex justify-content-between">
-                                        <span>Current: Single Family Membership</span>
-                                        <span>$100</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <span>Upgrade to: Double Family Membership</span>
-                                        <span>$200</span>
-                                    </div>
-                                    <hr>
-                                    <div class="d-flex justify-content-between fw-bold">
-                                        <span>Additional Cost:</span>
-                                        <span>$100</span>
-                                    </div>
+                                    <h6>Pricing Information</h6>
+                                    <p class="mb-1">• Single Membership: $200</p>
+                                    <p class="mb-0">• Double Membership: $200</p>
+                                    <small class="text-muted">Both membership types are now $200 each</small>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit Upgrade Request</button>
+                            <button type="submit" class="btn btn-primary">Submit Change Request</button>
                             <p class="small text-muted mt-2">
-                                After submitting, you'll be contacted for payment processing.
+                                Admin will review your request and contact you with next steps.
                             </p>
                         </div>
                     </form>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <h6>No Active Membership</h6>
+                        <p class="mb-0">You need to apply for membership first before requesting changes.</p>
+                        <a href="{% url 'single_application' %}" class="btn btn-primary btn-sm mt-2">Apply for Membership</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Your Upgrade Requests</h6>
+                    {% if upgrade_requests %}
+                        {% for request in upgrade_requests %}
+                        <div class="border-bottom pb-2 mb-2">
+                            <small class="text-muted">{{ request.created_at|date:"M d, Y" }}</small>
+                            <p class="mb-1">{{ request.current_membership|title }} → {{ request.requested_membership|title }}</p>
+                            <span class="badge bg-{% if request.status == 'approved' %}success{% elif request.status == 'rejected' %}danger{% else %}warning{% endif %}">
+                                {{ request.status|title }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No upgrade requests yet.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

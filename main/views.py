@@ -9,7 +9,7 @@ from django.db import models, transaction
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import render_to_string
 from django.utils import timezone
-from .models import MembershipApplication, Payment, Claim, Share, ContactMessage, UserProfile, ShareDeduction, Notification, Meeting, Announcement, Message
+from .models import MembershipApplication, Payment, Claim, Share, ContactMessage, UserProfile, ShareDeduction, Notification, Meeting, Announcement, Message, MembershipUpgrade
 
 @login_required
 def home(request):
@@ -493,11 +493,52 @@ def profile(request):
 
 @login_required
 def upgrade(request):
+    # Get user's current membership
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    current_membership = profile.membership_type or 'None'
+    
     if request.method == 'POST':
-        # Handle upgrade request
-        messages.success(request, 'Upgrade request submitted successfully! We will contact you for payment processing.')
+        requested_membership = request.POST.get('requested_membership')
+        reason = request.POST.get('reason')
+        
+        # Determine upgrade type
+        if current_membership == 'single' and requested_membership == 'double':
+            upgrade_type = 'single_to_double'
+        elif current_membership == 'double' and requested_membership == 'single':
+            upgrade_type = 'double_to_single'
+        else:
+            messages.error(request, 'Invalid upgrade request.')
+            return redirect('upgrade')
+        
+        # Create upgrade request
+        MembershipUpgrade.objects.create(
+            user=request.user,
+            current_membership=current_membership,
+            requested_membership=requested_membership,
+            upgrade_type=upgrade_type,
+            reason=reason
+        )
+        
+        # Send email notification to admin
+        send_mail(
+            'New Membership Upgrade Request',
+            f'User {request.user.username} has requested to upgrade from {current_membership} to {requested_membership}.\nReason: {reason}',
+            settings.DEFAULT_FROM_EMAIL,
+            [settings.DEFAULT_FROM_EMAIL],
+            fail_silently=True,
+        )
+        
+        messages.success(request, 'Upgrade request submitted successfully! Admin will review and contact you.')
         return redirect('upgrade')
-    return render(request, 'main/upgrade.html')
+    
+    # Get user's upgrade requests
+    upgrade_requests = MembershipUpgrade.objects.filter(user=request.user).order_by('-created_at')
+    
+    context = {
+        'current_membership': current_membership,
+        'upgrade_requests': upgrade_requests
+    }
+    return render(request, 'main/upgrade.html', context)
 
 
 
@@ -1191,6 +1232,6 @@ def double_application_view(request):
             fail_silently=True,
         )
         
-        messages.success(request, 'Application submitted successfully! Please proceed to payment ($400).')
+        messages.success(request, 'Application submitted successfully! Please proceed to payment ($200).')
         return redirect('payments')
     return render(request, 'main/double_application.html')
