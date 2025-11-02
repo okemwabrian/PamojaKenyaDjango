@@ -1,0 +1,191 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Payments - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>💳 My Payments</h2>
+        <button class="btn btn-primary" onclick="toggleForm()">
+            <span id="toggleText">+ Submit Payment</span>
+        </button>
+    </div>
+
+    <!-- Payment Form (Hidden by default) -->
+    <div id="paymentForm" class="row justify-content-center" style="display: none;">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Submit Payment</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Payment Type *</label>
+                                <select class="form-select" name="payment_type" required onchange="updateAmount(this)">
+                                    <option value="activation_fee">Activation Fee</option>
+                                    <option value="membership_single">Single Membership - $200</option>
+                                    <option value="membership_double">Double Membership - $400</option>
+                                    <option value="shares">Share Purchase</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Amount ($) *</label>
+                                <input type="number" class="form-control" name="amount" id="amount" min="0" step="0.01" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Payment Method *</label>
+                                <select class="form-select" name="payment_method" required onchange="showInstructions(this)">
+                                    <option value="">Select method...</option>
+                                    <option value="bank_transfer">Bank Transfer</option>
+                                    <option value="mobile_money">Mobile Money</option>
+                                    <option value="cash">Cash</option>
+                                    <option value="check">Check</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Transaction ID</label>
+                                <input type="text" class="form-control" name="transaction_id" placeholder="Reference number">
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="description" rows="3" placeholder="Payment details..."></textarea>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Payment Proof *</label>
+                                <input type="file" class="form-control" name="payment_proof" accept=".pdf,.jpg,.jpeg,.png" required>
+                                <div class="form-text">Upload receipt or proof of payment</div>
+                            </div>
+
+                            <!-- Payment Instructions -->
+                            <div class="col-12" id="paymentInstructions" style="display: none;">
+                                <div class="alert alert-info">
+                                    <h6 class="fw-bold mb-2">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Payment Instructions
+                                    </h6>
+                                    <div id="instructionContent"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Submit Payment</button>
+                                <button type="button" class="btn btn-secondary ms-2" onclick="toggleForm()">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments List -->
+    <div id="paymentsList" class="row">
+        <div class="col-12">
+            {% if payments %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Payment Type</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Admin Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                            <tr>
+                                <td>{{ payment.get_payment_type_display }}</td>
+                                <td>${{ payment.amount }}</td>
+                                <td>{{ payment.get_payment_method_display }}</td>
+                                <td>
+                                    <span class="badge bg-{% if payment.status == 'approved' %}success{% elif payment.status == 'rejected' %}danger{% else %}warning text-dark{% endif %}">
+                                        {{ payment.status|title }}
+                                    </span>
+                                </td>
+                                <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                                <td>{{ payment.admin_notes|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <h5>No payments submitted yet</h5>
+                    <p>Click "Submit Payment" to get started</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleForm() {
+    const form = document.getElementById('paymentForm');
+    const list = document.getElementById('paymentsList');
+    const toggleText = document.getElementById('toggleText');
+    
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+        list.style.display = 'none';
+        toggleText.textContent = 'View My Payments';
+    } else {
+        form.style.display = 'none';
+        list.style.display = 'block';
+        toggleText.textContent = '+ Submit Payment';
+    }
+}
+
+function updateAmount(select) {
+    const amount = document.getElementById('amount');
+    const amounts = {
+        'activation_fee': '50',
+        'membership_single': '200',
+        'membership_double': '400',
+        'shares': '20',
+        'other': ''
+    };
+    amount.value = amounts[select.value] || '';
+}
+
+function showInstructions(select) {
+    const instructions = document.getElementById('paymentInstructions');
+    const content = document.getElementById('instructionContent');
+    
+    const methods = {
+        'bank_transfer': 'Bank: Wells Fargo<br>Account: 1234567890<br>Routing: 121000248',
+        'mobile_money': 'M-Pesa: +1-555-0123<br>Zelle: pamoja@email.com',
+        'cash': 'Contact admin for cash payment arrangements',
+        'check': 'Make check payable to: Pamoja Kenya MN<br>Mail to: 123 Main St, Minneapolis, MN 55401'
+    };
+    
+    if (select.value && methods[select.value]) {
+        content.innerHTML = methods[select.value];
+        instructions.style.display = 'block';
+    } else {
+        instructions.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

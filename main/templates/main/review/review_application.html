@@ -1,0 +1,100 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Review Application - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-file-earmark-text"></i> Review Application</h2>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Application Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Name:</strong><br>
+                            {{ application.first_name }} {{ application.middle_name }} {{ application.last_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Type:</strong><br>
+                            {{ application.get_application_type_display }}
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <strong>Email:</strong><br>
+                            {{ application.email }}
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <strong>Phone:</strong><br>
+                            {{ application.phone_main }}
+                        </div>
+                        <div class="col-12 mt-2">
+                            <strong>Address:</strong><br>
+                            {{ application.address }}
+                        </div>
+                        <div class="col-12 mt-2">
+                            <strong>Submitted:</strong><br>
+                            {{ application.created_at|date:"M d, Y g:i A" }}
+                        </div>
+                    </div>
+
+                    {% if application.spouse %}
+                    <hr>
+                    <h6>Family Information</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Spouse:</strong> {{ application.spouse }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Spouse Phone:</strong> {{ application.spouse_phone }}
+                        </div>
+                        <div class="col-12">
+                            <strong>Authorized Rep:</strong> {{ application.authorized_rep }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if application.minnesota_id %}
+                    <hr>
+                    <h6>Documents</h6>
+                    <a href="{{ application.minnesota_id.url }}" target="_blank" class="btn btn-outline-info">
+                        <i class="bi bi-file-earmark"></i> View Minnesota ID
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Admin Actions</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status" required>
+                                <option value="pending" {% if application.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="approved" {% if application.status == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="rejected" {% if application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Admin Notes</label>
+                            <textarea class="form-control" name="admin_notes" rows="4">{{ application.admin_notes }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Application</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'main/base.html' %}
+
+{% block title %}My Claims - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-file-medical"></i> My Claims</h2>
+        <div>
+            <a href="{% url 'claims' %}" class="btn btn-primary">Submit New Claim</a>
+            <a href="{% url 'user_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+
+    {% if claims %}
+    <div class="row">
+        {% for claim in claims %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ claim.get_claim_type_display }}</h5>
+                    <span class="badge {% if claim.status == 'approved' %}bg-success{% elif claim.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                        {{ claim.get_status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <strong>Member Name:</strong><br>
+                            {{ claim.member_name }}
+                        </div>
+                        <div class="col-sm-6">
+                            <strong>Relationship:</strong><br>
+                            {{ claim.get_relationship_display }}
+                        </div>
+                        <div class="col-sm-6 mt-2">
+                            <strong>Amount Requested:</strong><br>
+                            ${{ claim.amount_requested }}
+                        </div>
+                        <div class="col-sm-6 mt-2">
+                            <strong>Incident Date:</strong><br>
+                            {{ claim.incident_date|date:"M d, Y" }}
+                        </div>
+                        <div class="col-12 mt-2">
+                            <strong>Submitted:</strong><br>
+                            {{ claim.created_at|date:"M d, Y g:i A" }}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <strong>Description:</strong>
+                        <p class="text-muted">{{ claim.description }}</p>
+                    </div>
+                    
+                    {% if claim.supporting_documents %}
+                    <div class="mt-2">
+                        <strong>Supporting Documents:</strong><br>
+                        <a href="{{ claim.supporting_documents.url }}" target="_blank" class="btn btn-sm btn-outline-info">
+                            <i class="bi bi-file-earmark"></i> View Documents
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    {% if claim.admin_notes %}
+                    <div class="mt-3">
+                        <strong>Admin Notes:</strong>
+                        <div class="alert alert-info">{{ claim.admin_notes }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if claim.status == 'approved' %}
+                    <div class="mt-3">
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle"></i> Your claim has been approved! Payment will be processed soon.
+                        </div>
+                    </div>
+                    {% elif claim.status == 'rejected' %}
+                    <div class="mt-3">
+                        <div class="alert alert-danger">
+                            <i class="bi bi-x-circle"></i> Your claim was not approved. Please contact admin for more information.
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="mt-3">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-clock"></i> Your claim is under review. You will be notified once it's processed.
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-file-medical display-1 text-muted"></i>
+            <h4 class="mt-3">No Claims Submitted</h4>
+            <p class="text-muted">You haven't submitted any benefit claims yet.</p>
+            <div class="mt-4">
+                <a href="{% url 'claims' %}" class="btn btn-primary">Submit Your First Claim</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

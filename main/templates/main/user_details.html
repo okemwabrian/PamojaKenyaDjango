@@ -1,0 +1,278 @@
+{% extends 'main/base.html' %}
+
+{% block title %}User Details - {{ profile.user.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-user"></i> User Details: {{ profile.user.username }}</h2>
+        <div>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print"></i> Print Report
+            </button>
+            <a href="{% url 'manage_users' %}" class="btn btn-secondary">Back to Users</a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- User Profile -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-user-circle"></i> Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Full Name:</strong></td>
+                            <td>{{ profile.user.first_name }} {{ profile.user.last_name }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Email:</strong></td>
+                            <td>{{ profile.user.email }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phone:</strong></td>
+                            <td>{{ profile.phone|default:"Not provided" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Address:</strong></td>
+                            <td>{{ profile.address|default:"Not provided" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Status:</strong></td>
+                            <td>
+                                <span class="badge {% if profile.status == 'active' %}bg-success{% elif profile.status == 'inactive' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ profile.get_status_display }}
+                                </span>
+                                {% if profile.is_deactivated %}
+                                <span class="badge bg-danger">Deactivated</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Shares Owned:</strong></td>
+                            <td>
+                                <span class="badge" style="background-color: 
+                                    {% if profile.shares_owned <= 20 %}#dc3545{% elif profile.shares_owned < 25 %}#ffc107{% else %}#28a745{% endif %};">
+                                    {{ profile.shares_owned }} shares
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Membership Type:</strong></td>
+                            <td>{{ membership_type }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Quick Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border rounded p-3 mb-2">
+                                <h4 class="text-primary">{{ applications.count }}</h4>
+                                <small>Applications</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-3 mb-2">
+                                <h4 class="text-success">{{ payments.count }}</h4>
+                                <small>Payments</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-3 mb-2">
+                                <h4 class="text-warning">{{ claims.count }}</h4>
+                                <small>Claims</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-3 mb-2">
+                                <h4 class="text-info">{{ shares.count }}</h4>
+                                <small>Share Purchases</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Applications -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-file-alt"></i> Membership Applications</h5>
+        </div>
+        <div class="card-body">
+            {% if applications %}
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td>{{ app.get_application_type_display }}</td>
+                            <td>
+                                <span class="badge {% if app.status == 'approved' %}bg-success{% elif app.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ app.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ app.created_at|date:"M d, Y" }}</td>
+                            <td>{{ app.admin_notes|default:"None" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No applications found.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Payments -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-dollar-sign"></i> Payments</h5>
+        </div>
+        <div class="card-body">
+            {% if payments %}
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td>{{ payment.get_payment_type_display }}</td>
+                            <td>${{ payment.amount }}</td>
+                            <td>{{ payment.get_payment_method_display }}</td>
+                            <td>
+                                <span class="badge {% if payment.status == 'approved' %}bg-success{% elif payment.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ payment.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No payments found.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Claims -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-hand-holding-medical"></i> Claims</h5>
+        </div>
+        <div class="card-body">
+            {% if claims %}
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Member</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for claim in claims %}
+                        <tr>
+                            <td>{{ claim.get_claim_type_display }}</td>
+                            <td>{{ claim.member_name }}</td>
+                            <td>${{ claim.amount_requested }}</td>
+                            <td>
+                                <span class="badge {% if claim.status == 'approved' %}bg-success{% elif claim.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ claim.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ claim.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No claims found.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Shares -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="fas fa-chart-pie"></i> Share Purchases</h5>
+        </div>
+        <div class="card-body">
+            {% if shares %}
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Shares</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for share in shares %}
+                        <tr>
+                            <td>{{ share.shares_purchased }}</td>
+                            <td>${{ share.amount }}</td>
+                            <td>{{ share.payment_method }}</td>
+                            <td>
+                                <span class="badge {% if share.status == 'approved' %}bg-success{% elif share.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ share.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ share.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No share purchases found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .btn, .card-header { display: none !important; }
+    .card { border: none !important; }
+}
+</style>
+{% endblock %}

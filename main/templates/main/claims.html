@@ -1,0 +1,100 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Claims - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🎆 My Claims</h2>
+        <button class="btn btn-primary" onclick="toggleForm()">+ Submit New Claim</button>
+    </div>
+
+    <!-- Claim Form (Hidden by default) -->
+    <div id="claimForm" class="row justify-content-center" style="display: none;">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Submit New Claim</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Claim Type *</label>
+                                <select class="form-select" name="claim_type" required>
+                                    <option value="">Select claim type...</option>
+                                    <option value="death">Death Benefit</option>
+                                    <option value="medical">Medical Emergency</option>
+                                    <option value="education">Education Support</option>
+                                    <option value="emergency">Emergency Assistance</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Member Name *</label>
+                                <input type="text" class="form-control" name="member_name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Relationship *</label>
+                                <select class="form-select" name="relationship" required>
+                                    <option value="">Select relationship...</option>
+                                    <option value="self">Self</option>
+                                    <option value="spouse">Spouse</option>
+                                    <option value="child">Child</option>
+                                    <option value="parent">Parent</option>
+                                    <option value="sibling">Sibling</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Incident Date *</label>
+                                <input type="date" class="form-control" name="incident_date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Amount Requested ($) *</label>
+                                <input type="number" class="form-control" name="amount_requested" min="1" step="0.01" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Description *</label>
+                                <textarea class="form-control" rows="4" name="description" placeholder="Detailed description of incident..." required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Supporting Documents</label>
+                                <input type="file" class="form-control" name="supporting_documents" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                                <div class="form-text">Upload relevant documents (medical bills, certificates, etc.)</div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Submit Claim</button>
+                                <button type="button" class="btn btn-secondary ms-2" onclick="toggleForm()">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Claims List -->
+    <div id="claimsList" class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <h5>No claims submitted yet</h5>
+                <p>Click "Submit New Claim" to get started</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleForm() {
+    const form = document.getElementById('claimForm');
+    const list = document.getElementById('claimsList');
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+        list.style.display = 'none';
+    } else {
+        form.style.display = 'none';
+        list.style.display = 'block';
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Financial Report - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-currency-dollar"></i> Financial Report</h2>
+        <div>
+            <button onclick="window.print()" class="btn btn-primary">Print Report</button>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4>Summary</h4>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="text-center p-3 border rounded">
+                        <h3 class="text-success">${{ total_revenue }}</h3>
+                        <small>Total Revenue</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center p-3 border rounded">
+                        <h3 class="text-primary">{{ payments.count }}</h3>
+                        <small>Total Payments</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>All Payments</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td>{{ payment.user.username }}</td>
+                            <td>{{ payment.get_payment_type_display }}</td>
+                            <td>${{ payment.amount }}</td>
+                            <td>{{ payment.get_payment_method_display }}</td>
+                            <td>
+                                <span class="badge {% if payment.status == 'approved' %}bg-success{% elif payment.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ payment.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .btn, .card-header { display: none !important; }
+    .card { border: none !important; }
+}
+</style>
+{% endblock %}

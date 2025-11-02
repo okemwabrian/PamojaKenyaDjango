@@ -1,0 +1,59 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Manage Notifications - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2">Manage Notifications</h1>
+            <p class="lead">View all system notifications</p>
+            <div class="mb-3">
+                <a href="{% url 'admin_create_notification' %}" class="btn btn-primary">Create Notification</a>
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if notifications %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Title</th>
+                                <th>Message</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for notification in notifications %}
+                            <tr class="{% if not notification.is_read %}table-warning{% endif %}">
+                                <td>{{ notification.user.username }}</td>
+                                <td>{{ notification.get_notification_type_display }}</td>
+                                <td>{{ notification.title }}</td>
+                                <td>{{ notification.message|truncatechars:50 }}</td>
+                                <td>
+                                    {% if notification.is_read %}
+                                        <span class="badge bg-success">Read</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Unread</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ notification.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted text-center py-5">No notifications found</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

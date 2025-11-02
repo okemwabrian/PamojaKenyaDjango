@@ -1,0 +1,96 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Review Claim - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2">Review Claim</h1>
+            <p class="lead">Review and approve/reject claim submission</p>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Claim Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>User:</strong> {{ claim.user.username }}</p>
+                            <p><strong>Claim Type:</strong> {{ claim.get_claim_type_display }}</p>
+                            <p><strong>Member Name:</strong> {{ claim.member_name }}</p>
+                            <p><strong>Relationship:</strong> {{ claim.relationship }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Incident Date:</strong> {{ claim.incident_date|date:"M d, Y" }}</p>
+                            <p><strong>Amount Requested:</strong> ${{ claim.amount_requested }}</p>
+                            <p><strong>Status:</strong> 
+                                {% if claim.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% elif claim.status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Submitted:</strong> {{ claim.created_at|date:"M d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <p><strong>Description:</strong></p>
+                        <p class="text-muted">{{ claim.description }}</p>
+                    </div>
+
+                    {% if claim.supporting_documents %}
+                    <div class="mt-3">
+                        <p><strong>Supporting Documents:</strong></p>
+                        <a href="{{ claim.supporting_documents.url }}" target="_blank" class="btn btn-outline-primary">View Documents</a>
+                    </div>
+                    {% endif %}
+
+                    {% if claim.admin_notes %}
+                    <div class="mt-3">
+                        <p><strong>Admin Notes:</strong></p>
+                        <p class="text-muted">{{ claim.admin_notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Update Status</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="pending" {% if claim.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="approved" {% if claim.status == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="rejected" {% if claim.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="admin_notes" class="form-label">Admin Notes</label>
+                            <textarea class="form-control" id="admin_notes" name="admin_notes" rows="4">{{ claim.admin_notes }}</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">Update Claim</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

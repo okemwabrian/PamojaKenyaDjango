@@ -1,0 +1,118 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Manage Users - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-users"></i> Manage Users</h2>
+        <div>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+    
+    <!-- Filter Options -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-12 col-sm-6 col-md-4">
+                    <label for="status" class="form-label">Filter by Status</label>
+                    <select class="form-select" id="status" name="status" onchange="this.form.submit()">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Users</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Users Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Shares</th>
+                            <th>Status</th>
+                            <th>Membership</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for profile in profiles %}
+                        <tr>
+                            <td>{{ profile.user.username }}</td>
+                            <td>{{ profile.user.first_name }} {{ profile.user.last_name }}</td>
+                            <td>{{ profile.user.email }}</td>
+                            <td>
+                                <span class="badge" style="background-color: 
+                                    {% if profile.shares_owned <= 20 %}#dc3545{% elif profile.shares_owned < 25 %}#ffc107{% else %}#28a745{% endif %};">
+                                    {{ profile.shares_owned }} shares
+                                </span>
+                            </td>
+                            <td>
+                                {% if not profile.user.is_active %}
+                                    <span class="badge bg-warning">Pending Approval</span>
+                                {% else %}
+                                    <span class="badge {% if profile.status == 'active' %}bg-success{% elif profile.status == 'inactive' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                        {{ profile.get_status_display }}
+                                    </span>
+                                    {% if profile.is_deactivated %}
+                                    <span class="badge bg-danger">Deactivated</span>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            <td>{{ profile.membership_type|default:"None" }}</td>
+                            <td>
+                                <div class="btn-group-vertical btn-group-sm d-md-none" role="group">
+                                    <a href="{% url 'user_details' profile.user.id %}" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if not profile.user.is_active %}
+                                    <a href="{% url 'activate_user' profile.user.id %}" class="btn btn-success btn-sm"
+                                       onclick="return confirm('Approve this user registration?')">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    {% elif profile.is_deactivated %}
+                                    <a href="{% url 'activate_user' profile.user.id %}" class="btn btn-success btn-sm"
+                                       onclick="return confirm('Activate this user?')">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                <div class="btn-group d-none d-md-flex" role="group">
+                                    <a href="{% url 'user_details' profile.user.id %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    {% if not profile.user.is_active %}
+                                    <a href="{% url 'activate_user' profile.user.id %}" class="btn btn-sm btn-success"
+                                       onclick="return confirm('Approve this user registration?')">
+                                        <i class="fas fa-check"></i> Approve
+                                    </a>
+                                    {% elif profile.is_deactivated %}
+                                    <a href="{% url 'activate_user' profile.user.id %}" class="btn btn-sm btn-success"
+                                       onclick="return confirm('Activate this user?')">
+                                        <i class="fas fa-check"></i> Activate
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">No users found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

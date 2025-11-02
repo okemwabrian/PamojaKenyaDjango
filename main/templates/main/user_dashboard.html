@@ -1,0 +1,395 @@
+{% extends 'main/base.html' %}
+{% load math_filters %}
+
+{% block title %}Dashboard - Pamoja Kenya MN{% endblock %}
+
+{% csrf_token %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h1 class="mb-2">Welcome, {{ user.get_full_name|default:user.username }}! 👋</h1>
+                    <p class="mb-0">Member since {{ user.date_joined|date:"F Y" }} | Status: 
+                        <span class="badge bg-{% if user.is_active and not profile.is_deactivated %}success{% else %}danger{% endif %}">
+                            {% if profile.is_deactivated %}Deactivated{% elif user.is_active %}Active{% else %}Pending Activation{% endif %}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notifications -->
+    {% if notifications %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-bell"></i> Notifications</h5>
+                    <div>
+                        <a href="{% url 'clear_notifications' %}" class="btn btn-sm btn-outline-dark me-2">Mark All Read</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% for notification in notifications %}
+                    <div class="alert alert-{% if notification.notification_type == 'shares_low' %}danger{% elif notification.notification_type == 'shares_deducted' %}warning{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                        <strong>{{ notification.title }}</strong><br>
+                        {{ notification.message }}
+                        <small class="text-muted d-block mt-1">{{ notification.created_at|date:"M d, Y g:i A" }}</small>
+                        <div class="mt-2">
+                            <button onclick="markAsRead({{ notification.id }})" class="btn btn-sm btn-outline-success me-1">Mark Read</button>
+                            <button onclick="deleteNotification({{ notification.id }})" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    function markAsRead(notificationId) {
+        fetch(`/mark-notification-read/${notificationId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json'
+            }
+        }).then(() => location.reload());
+    }
+    
+    function deleteNotification(notificationId) {
+        if (confirm('Delete this notification?')) {
+            fetch(`/delete-notification/${notificationId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json'
+                }
+            }).then(() => location.reload());
+        }
+    }
+    </script>
+    {% endif %}
+    
+    <!-- Account Status Warning -->
+    {% if profile.is_deactivated %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">⚠️ Account Deactivated</h4>
+                <p>Your account has been deactivated because your shares balance ({{ profile.shares_owned }}) is below the minimum required (20 shares).</p>
+                <p class="mb-0">Please <a href="{% url 'shares' %}" class="alert-link">purchase more shares</a> to reactivate your account.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-check display-4 mb-2"></i>
+                    <h3>{{ membership_status|default:"None" }}</h3>
+                    <small>Membership Type</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white" style="background-color: 
+                {% if shares_color == 'red' %}#dc3545{% elif shares_color == 'yellow' %}#ffc107{% else %}#28a745{% endif %}">
+                <div class="card-body text-center">
+                    <i class="bi bi-pie-chart display-4 mb-2"></i>
+                    <h3>{{ shares_owned|default:0 }}</h3>
+                    <small>Shares Owned</small>
+                    {% if profile.shares_owned <= 20 %}
+                    <div><small class="badge bg-danger">⚠️ Low Balance</small></div>
+                    {% elif profile.shares_owned < 25 %}
+                    <div><small class="badge bg-warning">⚠️ Warning</small></div>
+                    {% else %}
+                    <div><small class="badge bg-success">✅ Good</small></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-file-earmark-text display-4 mb-2"></i>
+                    <h3>{{ pending_claims|default:0 }}</h3>
+                    <small>Pending Claims</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-credit-card display-4 mb-2"></i>
+                    <h3>{{ pending_payments|default:0 }}</h3>
+                    <small>Pending Payments</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3">Quick Actions</h3>
+        </div>
+        
+        <!-- Membership Section -->
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-person-lines-fill display-4 text-primary mb-3"></i>
+                    <h5>Membership</h5>
+                    <p class="text-muted">Apply for or manage your membership</p>
+                    {% if not membership_status or membership_status == 'None' %}
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'single_application' %}" class="btn btn-primary btn-sm">Single Membership ($200)</a>
+                            <a href="{% url 'double_application' %}" class="btn btn-outline-primary btn-sm">Double Membership ($400)</a>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'my_applications' %}" class="btn btn-success">View My Applications</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payments Section -->
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-credit-card display-4 text-success mb-3"></i>
+                    <h5>Payments</h5>
+                    <p class="text-muted">Submit payments and view history</p>
+                    <a href="{% url 'payments' %}" class="btn btn-success">Manage Payments</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Shares Section -->
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-pie-chart display-4 text-info mb-3"></i>
+                    <h5>Share Investment</h5>
+                    <p class="text-muted">Buy shares and track investments</p>
+                    <a href="{% url 'shares' %}" class="btn btn-info">View Shares</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Claims Section -->
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-file-earmark-text display-4 text-warning mb-3"></i>
+                    <h5>Claims</h5>
+                    <p class="text-muted">Submit and track benefit claims</p>
+                    <a href="{% url 'claims' %}" class="btn btn-warning">Manage Claims</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Community Section -->
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-people display-4 text-secondary mb-3"></i>
+                    <h5>Community</h5>
+                    <p class="text-muted">Stay connected with announcements</p>
+                    <a href="{% url 'announcements' %}" class="btn btn-secondary">View Updates</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Meetings Section -->
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-camera-video display-4 text-dark mb-3"></i>
+                    <h5>Meetings</h5>
+                    <p class="text-muted">Join community meetings</p>
+                    <a href="{% url 'meetings' %}" class="btn btn-dark">View Meetings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">🚀 Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-6 col-md-3">
+                            <a href="{% url 'single_application' %}" class="btn btn-primary w-100 btn-sm">
+                                <i class="bi bi-person-plus d-block d-md-inline me-md-1"></i>
+                                <span class="d-none d-md-inline">Apply Membership</span>
+                                <span class="d-md-none small">Apply</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="{% url 'payments' %}" class="btn btn-success w-100 btn-sm">
+                                <i class="bi bi-credit-card d-block d-md-inline me-md-1"></i>
+                                <span class="d-none d-md-inline">Make Payment</span>
+                                <span class="d-md-none small">Payment</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="{% url 'claims' %}" class="btn btn-warning w-100 btn-sm">
+                                <i class="bi bi-file-earmark-plus d-block d-md-inline me-md-1"></i>
+                                <span class="d-none d-md-inline">Submit Claim</span>
+                                <span class="d-md-none small">Claim</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="{% url 'shares' %}" class="btn btn-info w-100 btn-sm">
+                                <i class="bi bi-graph-up d-block d-md-inline me-md-1"></i>
+                                <span class="d-none d-md-inline">Buy Shares</span>
+                                <span class="d-md-none small">Shares</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Applications -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📋 My Applications</h5>
+                    <a href="{% url 'single_application' %}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_applications %}
+                        <div class="list-group list-group-flush">
+                            {% for app in recent_applications %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ app.get_application_type_display }}</strong><br>
+                                    <small class="text-muted">{{ app.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                <span class="badge {% if app.status == 'approved' %}bg-success{% elif app.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ app.get_status_display }}
+                                </span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <p class="text-muted">No applications yet</p>
+                            <a href="{% url 'single_application' %}" class="btn btn-outline-primary btn-sm">
+                                Apply Now
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Payments -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">💳 My Payments</h5>
+                    <a href="{% url 'payments' %}" class="btn btn-sm btn-success">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_payments %}
+                        <div class="list-group list-group-flush">
+                            {% for payment in recent_payments %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${{ payment.amount }}</strong> - {{ payment.get_payment_type_display }}<br>
+                                    <small class="text-muted">{{ payment.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                <span class="badge {% if payment.status == 'approved' %}bg-success{% elif payment.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ payment.get_status_display }}
+                                </span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <p class="text-muted">No payments yet</p>
+                            <a href="{% url 'payments' %}" class="btn btn-outline-success btn-sm">
+                                Make Payment
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Claims -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">🎯 My Claims</h5>
+                    <a href="{% url 'claims' %}" class="btn btn-sm btn-warning">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_claims %}
+                        <div class="list-group list-group-flush">
+                            {% for claim in recent_claims %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${{ claim.amount_requested }}</strong> - {{ claim.get_claim_type_display }}<br>
+                                    <small class="text-muted">{{ claim.created_at|date:"M d, Y" }}</small>
+                                </div>
+                                <span class="badge {% if claim.status == 'approved' %}bg-success{% elif claim.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ claim.get_status_display }}
+                                </span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <p class="text-muted">No claims submitted</p>
+                            <a href="{% url 'claims' %}" class="btn btn-outline-warning btn-sm">
+                                Submit Claim
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- My Shares -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📈 My Shares</h5>
+                    <a href="{% url 'shares' %}" class="btn btn-sm btn-info">Buy More</a>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ shares_owned }}</h4>
+                            <small class="text-muted">Total Shares</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">${{ shares_owned|mul:20 }}</h4>
+                            <small class="text-muted">Share Value</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

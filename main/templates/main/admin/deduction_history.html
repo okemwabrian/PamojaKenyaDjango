@@ -1,0 +1,50 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Deduction History - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2">Share Deduction History</h1>
+            <p class="lead">View all share deduction records</p>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if deductions %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Reason</th>
+                                <th>Shares Deducted</th>
+                                <th>Remaining Shares</th>
+                                <th>Created By</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for deduction in deductions %}
+                            <tr>
+                                <td>{{ deduction.id }}</td>
+                                <td>{{ deduction.reason }}</td>
+                                <td class="text-danger">-{{ deduction.shares_deducted }}</td>
+                                <td>{{ deduction.total_remaining_shares }}</td>
+                                <td>{{ deduction.created_by.username }}</td>
+                                <td>{{ deduction.created_at|date:"M d, Y H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted text-center py-5">No deduction history found</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Manage Shares - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2">Manage Shares</h1>
+            <p class="lead">Review and manage share purchases</p>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if shares %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Shares</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for share in shares %}
+                            <tr>
+                                <td>{{ share.id }}</td>
+                                <td>{{ share.user.username }}</td>
+                                <td>{{ share.shares_purchased }}</td>
+                                <td>${{ share.amount }}</td>
+                                <td>{{ share.get_payment_method_display }}</td>
+                                <td>
+                                    {% if share.status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% elif share.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ share.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'review_share' share.id %}" class="btn btn-sm btn-info">Review</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted text-center py-5">No share purchases found</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

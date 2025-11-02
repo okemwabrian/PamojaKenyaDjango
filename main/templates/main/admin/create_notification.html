@@ -1,0 +1,53 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Create Notification - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2">📢 Create Notification</h1>
+            <p class="lead">Send notification to all members</p>
+            <a href="{% url 'admin_notifications' %}" class="btn btn-secondary">← Back to Notifications</a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">New Notification</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="notification_type" class="form-label">Type</label>
+                            <select class="form-select" id="notification_type" name="notification_type" required>
+                                <option value="general">General</option>
+                                <option value="shares_low">Low Shares</option>
+                                <option value="shares_deducted">Shares Deducted</option>
+                                <option value="claim_submitted">Claim Submitted</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required maxlength="200">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Send to All Members</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

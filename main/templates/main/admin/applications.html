@@ -1,0 +1,62 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Manage Applications - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2">Manage Applications</h1>
+            <p class="lead">Review and manage membership applications</p>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if applications %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                            <tr>
+                                <td>{{ app.id }}</td>
+                                <td>{{ app.first_name }} {{ app.last_name }}</td>
+                                <td><span class="badge bg-primary">{{ app.application_type|title }}</span></td>
+                                <td>{{ app.email }}</td>
+                                <td>
+                                    {% if app.status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% elif app.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ app.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'review_application' app.id %}" class="btn btn-sm btn-primary">Review</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted text-center py-5">No applications found</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

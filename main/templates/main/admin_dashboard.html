@@ -1,0 +1,355 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Admin Dashboard - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2">Admin Dashboard</h1>
+            <p class="lead">Manage Pamoja Kenya MN operations and member data</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-people display-4 mb-2"></i>
+                    <h3>{{ total_applications }}</h3>
+                    <small>Total Applications</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-credit-card display-4 mb-2"></i>
+                    <h3>{{ total_payments }}</h3>
+                    <small>Total Payments</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-file-earmark-text display-4 mb-2"></i>
+                    <h3>{{ total_claims }}</h3>
+                    <small>Total Claims</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <i class="bi bi-pie-chart display-4 mb-2"></i>
+                    <h3>{{ total_shares }}</h3>
+                    <small>Total Shares</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">🚀 Admin Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <a href="{% url 'manage_users' %}?status=pending" class="btn btn-warning w-100 btn-sm">
+                                <i class="bi bi-person-check d-block d-sm-inline me-sm-1"></i>
+                                <span class="d-none d-sm-inline">Pending Users</span>
+                                {% if pending_users > 0 %}
+                                <span class="badge bg-danger ms-1">{{ pending_users }}</span>
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <a href="{% url 'admin_applications' %}" class="btn btn-primary w-100 btn-sm">
+                                <i class="bi bi-person-lines-fill d-block d-sm-inline me-sm-1"></i>
+                                <span class="d-none d-sm-inline">Applications</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <a href="{% url 'admin_payments' %}" class="btn btn-success w-100 btn-sm">
+                                <i class="bi bi-credit-card d-block d-sm-inline me-sm-1"></i>
+                                <span class="d-none d-sm-inline">Payments</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <a href="{% url 'admin_claims' %}" class="btn btn-warning w-100 btn-sm">
+                                <i class="bi bi-file-earmark-text d-block d-sm-inline me-sm-1"></i>
+                                <span class="d-none d-sm-inline">Claims</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <a href="{% url 'admin_shares' %}" class="btn btn-info w-100 btn-sm">
+                                <i class="bi bi-pie-chart d-block d-sm-inline me-sm-1"></i>
+                                <span class="d-none d-sm-inline">Shares</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <a href="{% url 'manage_users' %}" class="btn btn-dark w-100 btn-sm">
+                                <i class="bi bi-people d-block d-sm-inline me-sm-1"></i>
+                                <span class="d-none d-sm-inline">Users</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <a href="{% url 'deduct_shares' %}" class="btn btn-danger w-100 btn-sm">
+                                <i class="bi bi-exclamation-triangle d-block d-sm-inline me-sm-1"></i>
+                                <span class="d-none d-sm-inline">Deduct</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <a href="{% url 'admin_messages' %}" class="btn btn-secondary w-100 btn-sm">
+                                <i class="bi bi-envelope d-block d-sm-inline me-sm-1"></i>
+                                <span class="d-none d-sm-inline">Messages</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <a href="{% url 'admin_notifications' %}" class="btn btn-outline-primary w-100 btn-sm">
+                                <i class="bi bi-bell d-block d-sm-inline me-sm-1"></i>
+                                <span class="d-none d-sm-inline">Notifications</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <a href="{% url 'admin_meetings' %}" class="btn btn-outline-info w-100 btn-sm">
+                                <i class="bi bi-calendar-event d-block d-sm-inline me-sm-1"></i>
+                                <span class="d-none d-sm-inline">Meetings</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <a href="{% url 'admin_announcements' %}" class="btn btn-outline-warning w-100 btn-sm">
+                                <i class="bi bi-megaphone d-block d-sm-inline me-sm-1"></i>
+                                <span class="d-none d-sm-inline">Announcements</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-success w-100 btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-printer d-block d-sm-inline me-sm-1"></i>
+                                    <span class="d-none d-sm-inline">Reports</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'print_financial_report' %}"><i class="bi bi-currency-dollar me-2"></i>Financial</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'print_shares_report' %}"><i class="bi bi-pie-chart me-2"></i>Shares</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'print_members_report' %}"><i class="bi bi-people me-2"></i>Members</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'print_claims_report' %}"><i class="bi bi-file-medical me-2"></i>Claims</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row g-4">
+        <!-- Pending Applications -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📋 Pending Applications</h5>
+                    <a href="{% url 'admin_applications' %}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if pending_applications %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for app in pending_applications %}
+                                    <tr>
+                                        <td>{{ app.first_name }} {{ app.last_name }}</td>
+                                        <td><span class="badge bg-primary">{{ app.application_type|title }}</span></td>
+                                        <td>{{ app.created_at|date:"M d" }}</td>
+                                        <td>
+                                            <a href="{% url 'review_application' app.id %}" class="btn btn-sm btn-outline-primary">Review</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No pending applications</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Payments -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">💳 Pending Payments</h5>
+                    <a href="{% url 'admin_payments' %}" class="btn btn-sm btn-success">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if pending_payments %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in pending_payments %}
+                                    <tr>
+                                        <td>{{ payment.user.username }}</td>
+                                        <td>{{ payment.get_payment_type_display }}</td>
+                                        <td>${{ payment.amount }}</td>
+                                        <td>
+                                            <a href="{% url 'review_payment' payment.id %}" class="btn btn-sm btn-outline-success">Review</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No pending payments</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Claims -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">🎯 Pending Claims</h5>
+                    <a href="{% url 'admin_claims' %}" class="btn btn-sm btn-warning">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if pending_claims %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for claim in pending_claims %}
+                                    <tr>
+                                        <td>{{ claim.user.username }}</td>
+                                        <td>{{ claim.get_claim_type_display }}</td>
+                                        <td>${{ claim.amount_requested }}</td>
+                                        <td>
+                                            <a href="{% url 'review_claim' claim.id %}" class="btn btn-sm btn-outline-warning">Review</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No pending claims</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Shares -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📈 Pending Shares</h5>
+                    <a href="{% url 'admin_shares' %}" class="btn btn-sm btn-info">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if pending_shares %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Shares</th>
+                                        <th>Amount</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for share in pending_shares %}
+                                    <tr>
+                                        <td>{{ share.user.username }}</td>
+                                        <td>{{ share.shares_purchased }}</td>
+                                        <td>${{ share.amount }}</td>
+                                        <td>
+                                            <a href="{% url 'review_share' share.id %}" class="btn btn-sm btn-outline-info">Review</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No pending shares</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Messages -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📧 Recent Messages</h5>
+                    <a href="{% url 'admin_messages' %}" class="btn btn-sm btn-secondary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_messages %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>From</th>
+                                        <th>Subject</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for msg in recent_messages %}
+                                    <tr class="{% if not msg.is_read %}table-warning{% endif %}">
+                                        <td>{{ msg.name }}</td>
+                                        <td>{{ msg.subject|truncatechars:30 }}</td>
+                                        <td>{{ msg.created_at|date:"M d" }}</td>
+                                        <td>
+                                            <a href="{% url 'view_message' msg.id %}" class="btn btn-sm btn-outline-secondary">View</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No recent messages</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

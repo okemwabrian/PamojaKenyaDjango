@@ -1,0 +1,91 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Messages - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2">💬 Messages</h1>
+            <p class="lead">Communicate with administrators</p>
+            <a href="{% url 'send_message_to_admin' %}" class="btn btn-primary">Send New Message</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Received Messages -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">📥 Received Messages</h5>
+                </div>
+                <div class="card-body">
+                    {% if received_messages %}
+                        {% for message in received_messages %}
+                        <div class="card mb-3 {% if not message.is_read %}border-primary{% endif %}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="card-title">
+                                            {% if not message.is_read %}
+                                                <span class="badge bg-primary me-2">New</span>
+                                            {% endif %}
+                                            {{ message.subject }}
+                                        </h6>
+                                        <p class="card-text">{{ message.content|truncatechars:100 }}</p>
+                                        <small class="text-muted">
+                                            From: {{ message.sender.username }} | {{ message.created_at|date:"M d, Y H:i" }}
+                                        </small>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="{% url 'reply_message' message.id %}">Reply</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">No messages received</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sent Messages -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">📤 Sent Messages</h5>
+                </div>
+                <div class="card-body">
+                    {% if sent_messages %}
+                        {% for message in sent_messages %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ message.subject }}</h6>
+                                <p class="card-text">{{ message.content|truncatechars:100 }}</p>
+                                <small class="text-muted">
+                                    To: {{ message.recipient.username }} | {{ message.created_at|date:"M d, Y H:i" }}
+                                    {% if message.is_read %}
+                                        <span class="badge bg-success ms-2">Read</span>
+                                    {% else %}
+                                        <span class="badge bg-warning ms-2">Unread</span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center py-3">No messages sent</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

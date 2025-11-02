@@ -1,0 +1,79 @@
+{% extends 'main/base.html' %}
+
+{% block title %}View Message - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-envelope"></i> Message from {{ message.name }}</h2>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ message.subject }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>From:</strong> {{ message.name }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Email:</strong> {{ message.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Phone:</strong> {{ message.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Date:</strong> {{ message.created_at|date:"M d, Y g:i A" }}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <strong>Message:</strong>
+                        <div class="mt-2 p-3 bg-light rounded">
+                            {{ message.message|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Send Reply</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Reply Message</label>
+                            <textarea class="form-control" name="reply_content" rows="6" placeholder="Type your reply here..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-send"></i> Send Reply
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% if message.user %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6>User Information</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Username:</strong> {{ message.user.username }}</p>
+                    <p><strong>Full Name:</strong> {{ message.user.first_name }} {{ message.user.last_name }}</p>
+                    <p><strong>Email:</strong> {{ message.user.email }}</p>
+                    <a href="{% url 'user_details' message.user.id %}" class="btn btn-sm btn-outline-info">View Full Profile</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

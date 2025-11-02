@@ -1,0 +1,101 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Membership - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 mb-3">🏠 Membership Options</h1>
+        <p class="lead text-muted">Choose the membership plan that best fits your family</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <!-- Single Membership -->
+        <div class="col-lg-5 mb-4">
+            <div class="card h-100 border-primary">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">Single Family</h3>
+                    <p class="mb-0">Perfect for individual families</p>
+                </div>
+                <div class="card-body text-center">
+                    <div class="display-4 text-primary mb-3">$100</div>
+                    <p class="text-muted mb-4">One-time membership fee</p>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Coverage for immediate family</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Death benefit support</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Emergency assistance</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Community meetings access</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Share investment opportunities</li>
+                    </ul>
+                    
+                    <a href="{% url 'single_application' %}" class="btn btn-primary btn-lg">Apply Now</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Double Membership -->
+        <div class="col-lg-5 mb-4">
+            <div class="card h-100 border-success">
+                <div class="card-header bg-success text-white text-center">
+                    <h3 class="mb-0">Double Family</h3>
+                    <p class="mb-0">Extended family coverage</p>
+                </div>
+                <div class="card-body text-center">
+                    <div class="display-4 text-success mb-3">$200</div>
+                    <p class="text-muted mb-4">One-time membership fee</p>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Coverage for both sides of family</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Extended death benefit support</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Emergency assistance</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Community meetings access</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Share investment opportunities</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Priority support</li>
+                    </ul>
+                    
+                    <a href="{% url 'double_application' %}" class="btn btn-success btn-lg">Apply Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Information -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h4 class="text-center mb-4">Membership Benefits</h4>
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="bi bi-shield-check display-4 text-primary mb-3"></i>
+                            <h5>Financial Protection</h5>
+                            <p class="text-muted">Support during difficult times with funeral and emergency expenses</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="bi bi-people display-4 text-success mb-3"></i>
+                            <h5>Community Support</h5>
+                            <p class="text-muted">Connect with fellow Kenyans and build lasting relationships</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="bi bi-graph-up display-4 text-info mb-3"></i>
+                            <h5>Investment Opportunities</h5>
+                            <p class="text-muted">Grow your wealth through our share investment program</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <h4>Ready to Join?</h4>
+            <p class="text-muted mb-4">Have questions? Contact us before applying</p>
+            <a href="{% url 'contact' %}" class="btn btn-outline-primary me-3">Contact Us</a>
+            <a href="{% url 'about' %}" class="btn btn-outline-secondary">Learn More</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

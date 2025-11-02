@@ -1,0 +1,105 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Manage Messages - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2">Manage Messages</h1>
+            <p class="lead">Review and respond to user messages</p>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Contact Messages</h5>
+                </div>
+                <div class="card-body">
+                    {% if contact_messages %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>From</th>
+                                        <th>Subject</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for msg in contact_messages %}
+                                    <tr class="{% if not msg.is_read %}table-warning{% endif %}">
+                                        <td>{{ msg.name }}</td>
+                                        <td>{{ msg.subject|truncatechars:30 }}</td>
+                                        <td>{{ msg.created_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if msg.is_read %}
+                                                <span class="badge bg-success">Read</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Unread</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'view_message' msg.id %}" class="btn btn-sm btn-primary">View</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No contact messages</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">User Messages</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_messages %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>From</th>
+                                        <th>Subject</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for msg in user_messages %}
+                                    <tr class="{% if not msg.is_read %}table-warning{% endif %}">
+                                        <td>{{ msg.sender.username }}</td>
+                                        <td>{{ msg.subject|truncatechars:30 }}</td>
+                                        <td>{{ msg.created_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if msg.is_read %}
+                                                <span class="badge bg-success">Read</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Unread</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No user messages</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

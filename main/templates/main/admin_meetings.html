@@ -1,0 +1,141 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Manage Meetings - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="display-5 mb-3">🎥 Meeting Management</h1>
+        <p class="lead text-muted">Schedule and manage community meetings</p>
+        <button class="btn btn-primary btn-lg px-4" data-bs-toggle="modal" data-bs-target="#meetingModal">
+            <i class="bi bi-plus-circle me-2"></i> Create New Meeting
+        </button>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body p-0">
+            {% if meetings %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Meeting Title</th>
+                            <th>Date & Time</th>
+                            <th>Location</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for meeting in meetings %}
+                        <tr>
+                            <td>
+                                <strong>{{ meeting.title }}</strong>
+                                {% if meeting.description %}
+                                <small class="d-block text-muted">{{ meeting.description|truncatechars:100 }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>{{ meeting.date|date:"M d, Y" }}</div>
+                                <small class="text-muted">{{ meeting.time|time:"g:i A" }}</small>
+                            </td>
+                            <td>{{ meeting.location|default:"TBD" }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ meeting.get_meeting_type_display }}</span>
+                            </td>
+                            <td>
+                                <span class="badge {% if meeting.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {% if meeting.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'edit_meeting' meeting.id %}" class="btn btn-outline-warning" title="Edit Meeting">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'delete_meeting' meeting.id %}" class="btn btn-outline-danger" 
+                                       onclick="return confirm('Delete this meeting?')" title="Delete Meeting">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-event display-1 text-muted"></i>
+                <h5 class="mt-3">No Meetings Scheduled</h5>
+                <p class="text-muted">Create your first meeting to get started.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Meeting Modal -->
+<div class="modal fade" id="meetingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Meeting</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Meeting Title *</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" name="date" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Time</label>
+                            <input type="time" class="form-control" name="time" required>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-control" name="location" placeholder="Meeting location or virtual link">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Meeting Type</label>
+                            <select class="form-select" name="meeting_type">
+                                <option value="general">General Meeting</option>
+                                <option value="board">Board Meeting</option>
+                                <option value="annual">Annual Meeting</option>
+                                <option value="special">Special Meeting</option>
+                                <option value="emergency">Emergency Meeting</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Max Attendees</label>
+                            <input type="number" class="form-control" name="max_attendees" placeholder="Leave empty for unlimited">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_active" checked>
+                                <label class="form-check-label">Active Meeting (visible to members)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Meeting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

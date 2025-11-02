@@ -1,0 +1,118 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Announcements - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">📢 Announcements & Events</h2>
+    
+    <div class="row g-4">
+        <!-- Announcements Section -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">📋 Latest Announcements</h3>
+                </div>
+                <div class="card-body">
+                    {% if announcements %}
+                        <div class="announcements-list">
+                            {% for announcement in announcements %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="mb-0">{{ announcement.title }}</h5>
+                                        <span class="badge {% if announcement.announcement_type == 'urgent' %}bg-danger{% elif announcement.announcement_type == 'event' %}bg-info{% elif announcement.announcement_type == 'policy' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                            {{ announcement.get_announcement_type_display }}
+                                        </span>
+                                    </div>
+                                    <p class="mb-2">{{ announcement.content }}</p>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>
+                                        {{ announcement.created_at|date:"M d, Y g:i A" }}
+                                    </small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-megaphone display-1 text-muted"></i>
+                            <p class="text-muted mt-3">No announcements at this time.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Events Section -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">📅 Upcoming Events</h3>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_meetings %}
+                        <div class="events-list">
+                            {% for meeting in upcoming_meetings %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="mb-0">{{ meeting.title }}</h5>
+                                        <span class="badge bg-info">{{ meeting.get_meeting_type_display }}</span>
+                                    </div>
+                                    <p class="mb-2">{{ meeting.description }}</p>
+                                    <div class="row g-2 mb-2">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">
+                                                <i class="bi bi-calendar3 me-1"></i>Date & Time
+                                            </small>
+                                            <strong>{{ meeting.date|date:"M d, Y" }}</strong><br>
+                                            <strong>{{ meeting.time|time:"g:i A" }}</strong>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">
+                                                <i class="bi bi-geo-alt me-1"></i>Location
+                                            </small>
+                                            <strong>{{ meeting.location|default:"TBA" }}</strong>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>
+                                        Scheduled {{ meeting.created_at|date:"M d, Y" }}
+                                    </small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-calendar-event display-1 text-muted"></i>
+                            <p class="text-muted mt-3">No upcoming events scheduled.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body text-center py-4">
+                    <h3 class="mb-3">Stay Connected</h3>
+                    <p class="mb-3">Don't miss important updates! Make sure you're logged in to receive notifications about new announcements and events.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        {% if not user.is_authenticated %}
+                            <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+                        {% else %}
+                            <a href="{% url 'user_dashboard' %}" class="btn btn-outline-primary">Go to Dashboard</a>
+                        {% endif %}
+                        <a href="{% url 'contact' %}" class="btn btn-outline-secondary">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

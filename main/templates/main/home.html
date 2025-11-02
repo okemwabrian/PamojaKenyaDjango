@@ -1,0 +1,172 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Home - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Banner Section -->
+    <section class="home-banner text-center p-5 rounded mb-5" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);">
+        <h1 class="display-4 fw-bold text-white">Pamoja Kenya MN taking the lead at the time of need.</h1>
+        <p class="lead mt-3 text-light">
+            Pamoja Kenya supports your family when you or a loved one passes away by providing funds for the cost of a funeral, burial, and other related unexpected expenses irrespective of where your family member lives.
+        </p>
+    </section>
+
+    <!-- Latest News Section -->
+    <section class="latest-news my-5">
+        <h2 class="text-center fw-bold mb-4">Latest News & Events</h2>
+        
+        <div class="row g-4">
+            <!-- Latest Announcements -->
+            <div class="col-md-6">
+                <h3 class="h5 mb-3">📢 Recent Announcements</h3>
+                {% if latest_announcements %}
+                    {% for announcement in latest_announcements %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ announcement.title }}</h5>
+                            <p class="card-text">
+                                {{ announcement.content|truncatechars:100 }}
+                            </p>
+                            <small class="text-muted">{{ announcement.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-muted">
+                        <p>No recent announcements</p>
+                    </div>
+                {% endif %}
+                <a href="{% url 'announcements' %}" class="btn btn-outline-primary btn-sm">View All Announcements</a>
+            </div>
+            
+            <!-- Latest Events -->
+            <div class="col-md-6">
+                <h3 class="h5 mb-3">📅 Upcoming Events</h3>
+                {% if latest_events %}
+                    {% for meeting in latest_events %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ meeting.title }}</h5>
+                            <p class="card-text">
+                                {{ meeting.description|truncatechars:100|default:"" }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">{{ meeting.date|date:"M d, Y" }}</small>
+                                {% if meeting.type == 'virtual' %}
+                                <span class="badge bg-primary">Virtual</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-muted">
+                        <p>No upcoming events</p>
+                    </div>
+                {% endif %}
+                <a href="{% url 'meetings' %}" class="btn btn-outline-primary btn-sm">View All Meetings</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Shares Information Section -->
+    <section class="shares-info mb-5">
+        <div class="text-center">
+            <h2 class="fw-bold mb-4">💰 Build Your Financial Security with Shares</h2>
+            <p class="lead mb-4">
+                Invest in your future and strengthen our community by purchasing shares. Your investment helps us provide better benefits and support to all members.
+            </p>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="bg-primary text-white rounded-circle p-3 mb-2">
+                            <i class="bi bi-piggy-bank"></i>
+                        </div>
+                        <h6 class="mb-1">Affordable Investment</h6>
+                        <small class="text-muted">Start with as little as $20</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="bg-success text-white rounded-circle p-3 mb-2">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h6 class="mb-1">Growing Returns</h6>
+                        <small class="text-muted">Watch your investment grow</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="bg-info text-white rounded-circle p-3 mb-2">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h6 class="mb-1">Secure Investment</h6>
+                        <small class="text-muted">Safe and reliable returns</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="bg-warning text-white rounded-circle p-3 mb-2">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h6 class="mb-1">Community Impact</h6>
+                        <small class="text-muted">Strengthen our collective support</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-center">
+                <a href="{% url 'membership' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-person-plus me-2"></i>Become a Member
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="why-choose-us text-center bg-white p-5 rounded shadow-sm mb-5">
+        <h2 class="fw-bold mb-4">Why Choose Pamoja Kenya MN?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <h5 class="text-primary">Trusted by Families</h5>
+                <p class="text-muted">We've helped hundreds of families navigate tough times with dignity and support.</p>
+            </div>
+            <div class="col-md-4">
+                <h5 class="text-primary">Transparent & Affordable</h5>
+                <p class="text-muted">No hidden fees, no surprises — just real help when it matters most.</p>
+            </div>
+            <div class="col-md-4">
+                <h5 class="text-primary">Nationwide Reach</h5>
+                <p class="text-muted">Support available whether your loved ones are in Kenya, the US, or beyond.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upgrade Section -->
+    <section class="upgrade-info text-center p-4 rounded mb-5 border">
+        <h2 class="fw-bold mb-3">Upgrade To Double Family Membership</h2>
+        <p class="mb-4">Current members can upgrade their single family membership at any time.</p>
+        <a href="{% url 'double_application' %}" class="btn btn-primary btn-lg">Upgrade Here</a>
+    </section>
+
+    <!-- Testimonial Section -->
+    <section class="testimonial p-4 rounded shadow-sm mb-5">
+        <blockquote class="blockquote text-center fst-italic mb-3">
+            "A testimonial from a client who benefited from your product or service. Testimonials can be a highly effective way of establishing credibility and increasing your company's reputation."
+        </blockquote>
+        <footer class="blockquote-footer text-center text-muted">Client Name – Location</footer>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="footer text-center small">
+        <h3 class="mb-3">Contact Us</h3>
+        <p>P.O. Box 473 Shakopee, MN 55379</p>
+        <p>Phone: (612) 261-5786 / (612) 483‑2041 / (612) 644‑3222</p>
+        <p>Mon‑Fri By Appointment</p>
+        <p><a href="{% url 'contact' %}" class="text-decoration-none">Contact Us</a></p>
+        <small class="d-block mt-3">&copy; 2025 All Rights Reserved.</small>
+    </footer>
+</div>
+{% endblock %}

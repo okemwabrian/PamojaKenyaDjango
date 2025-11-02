@@ -1,0 +1,46 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Deduct Shares - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Emergency Share Deduction</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <strong>Warning:</strong> This action will deduct shares from ALL users and cannot be undone. 
+                        Users with 20 or fewer shares after deduction will be automatically deactivated.
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="shares_to_deduct" class="form-label">Shares to Deduct</label>
+                            <input type="number" class="form-control" id="shares_to_deduct" name="shares_to_deduct" 
+                                   min="1" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason for Deduction</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="4" 
+                                      placeholder="Explain the reason for this emergency deduction..." required></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-danger" 
+                                    onclick="return confirm('Are you sure you want to deduct shares from ALL users? This cannot be undone.')">
+                                <i class="fas fa-minus-circle"></i> Deduct Shares
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

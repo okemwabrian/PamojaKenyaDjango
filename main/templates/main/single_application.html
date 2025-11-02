@@ -1,0 +1,139 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Single Application - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">🏠 Single Family Membership</h1>
+                <p class="lead text-muted">Join the Pamoja community with our single family membership plan</p>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-fill me-2"></i>
+                        Application Form
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" name="first_name" class="form-control" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Middle Name</label>
+                                <input type="text" name="middle_name" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" name="last_name" class="form-control" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Email Address *</label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Address *</label>
+                                <input type="text" name="address" class="form-control" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Phone Main *</label>
+                                <input type="tel" name="phone_main" class="form-control" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Minnesota Picture ID *</label>
+                                <input type="file" name="minnesota_id" class="form-control" accept="image/*,.pdf" required>
+                            </div>
+                            
+                            <div class="col-12 mt-4">
+                                <h5>Spouse / Next of Kin / Children / Parents</h5>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Spouse</label>
+                                <input type="text" name="spouse" class="form-control">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Phone (Spouse)</label>
+                                <input type="tel" name="spouse_phone" class="form-control">
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Authorized Representative</label>
+                                <input type="text" name="authorized_rep" class="form-control">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Child 1</label>
+                                <input type="text" name="child_1" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Child 2</label>
+                                <input type="text" name="child_2" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Child 3</label>
+                                <input type="text" name="child_3" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Child 4</label>
+                                <input type="text" name="child_4" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Child 5</label>
+                                <input type="text" name="child_5" class="form-control">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Parent 1</label>
+                                <input type="text" name="parent_1" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Parent 2</label>
+                                <input type="text" name="parent_2" class="form-control">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Sibling 1</label>
+                                <input type="text" name="sibling_1" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Sibling 2</label>
+                                <input type="text" name="sibling_2" class="form-control">
+                            </div>
+                            
+                            <div class="col-12 mt-4">
+                                <h5>Checkboxes</h5>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="constitution_agreed" id="constitution_agreed" required>
+                                    <label class="form-check-label" for="constitution_agreed">
+                                        I have read the Pamoja Constitution and agree to the conditions listed above.
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12 text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    Submit Application
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

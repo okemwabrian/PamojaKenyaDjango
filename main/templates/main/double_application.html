@@ -1,0 +1,145 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Double Application - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Double Family Membership Application</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" class="row g-3">
+                {% csrf_token %}
+                
+                <!-- Personal Information -->
+                <div class="col-12"><h4>Personal Information</h4></div>
+                <div class="col-md-4">
+                    <label class="form-label">First Name *</label>
+                    <input type="text" class="form-control" name="first_name" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Middle Name</label>
+                    <input type="text" class="form-control" name="middle_name">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Last Name *</label>
+                    <input type="text" class="form-control" name="last_name" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-control" name="email" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Confirm Email *</label>
+                    <input type="email" class="form-control" name="confirm_email" required>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Phone *</label>
+                    <input type="tel" class="form-control" name="phone" required>
+                </div>
+
+                <!-- Address -->
+                <div class="col-12"><h4>Address Information</h4></div>
+                <div class="col-12">
+                    <label class="form-label">Address Line 1 *</label>
+                    <input type="text" class="form-control" name="address_1" required>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Address Line 2</label>
+                    <input type="text" class="form-control" name="address_2">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">City *</label>
+                    <input type="text" class="form-control" name="city" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">State/Province *</label>
+                    <input type="text" class="form-control" name="state_province" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">ZIP/Postal *</label>
+                    <input type="text" class="form-control" name="zip_postal" required>
+                </div>
+
+                <!-- Family -->
+                <div class="col-12"><h4>Family Information</h4></div>
+                <div class="col-md-6">
+                    <label class="form-label">Spouse Name</label>
+                    <input type="text" class="form-control" name="spouse_name">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Spouse Phone</label>
+                    <input type="tel" class="form-control" name="spouse_phone">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Authorized Representative</label>
+                    <input type="text" class="form-control" name="authorized_rep">
+                </div>
+                
+                <!-- Children -->
+                <div class="col-12"><h5>Children</h5></div>
+                {% for i in "12345" %}
+                <div class="col-md-6">
+                    <label class="form-label">Child {{ i }}</label>
+                    <input type="text" class="form-control" name="child_{{ i }}">
+                </div>
+                {% endfor %}
+                
+                <!-- Parents -->
+                <div class="col-12"><h5>Parents (Both Sides)</h5></div>
+                <div class="col-md-6">
+                    <label class="form-label">Your Parent 1</label>
+                    <input type="text" class="form-control" name="parent_1">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Your Parent 2</label>
+                    <input type="text" class="form-control" name="parent_2">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Spouse Parent 1</label>
+                    <input type="text" class="form-control" name="spouse_parent_1">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Spouse Parent 2</label>
+                    <input type="text" class="form-control" name="spouse_parent_2">
+                </div>
+                
+                <!-- Siblings -->
+                <div class="col-12"><h5>Siblings</h5></div>
+                <div class="col-md-4">
+                    <label class="form-label">Sibling 1</label>
+                    <input type="text" class="form-control" name="sibling_1">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Sibling 2</label>
+                    <input type="text" class="form-control" name="sibling_2">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Sibling 3</label>
+                    <input type="text" class="form-control" name="sibling_3">
+                </div>
+
+                <!-- ID Document -->
+                <div class="col-12"><h4>Identification Document</h4></div>
+                <div class="col-12">
+                    <label class="form-label">Minnesota ID or Valid ID *</label>
+                    <input type="file" class="form-control" name="id_document" accept="image/*,.pdf" required>
+                    <div class="form-text">Upload clear photo/scan of government-issued ID (JPG, PNG, PDF - Max 5MB)</div>
+                </div>
+
+                <!-- Agreement -->
+                <div class="col-12">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="constitution_agreed" required>
+                        <label class="form-check-label">I have read the Pamoja Constitution and agree to the conditions *</label>
+                    </div>
+                </div>
+
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Submit Double Family Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

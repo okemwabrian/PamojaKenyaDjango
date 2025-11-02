@@ -1,0 +1,136 @@
+{% extends 'main/base.html' %}
+
+{% block title %}My Profile - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-2">👤 My Profile</h1>
+            <p class="lead">Manage your personal information</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information -->
+                        <h6 class="mb-3">Basic Information</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ profile.phone }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Address Information -->
+                        <h6 class="mb-3 mt-4">Address Information</h6>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Street Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="2">{{ profile.address }}</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="city" class="form-label">City</label>
+                                    <input type="text" class="form-control" id="city" name="city" value="{{ profile.city }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="state" class="form-label">State</label>
+                                    <input type="text" class="form-control" id="state" name="state" value="{{ profile.state }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="zip_code" class="form-label">ZIP Code</label>
+                                    <input type="text" class="form-control" id="zip_code" name="zip_code" value="{{ profile.zip_code }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Emergency Contact -->
+                        <h6 class="mb-3 mt-4">Emergency Contact</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="emergency_contact_name" class="form-label">Contact Name</label>
+                                    <input type="text" class="form-control" id="emergency_contact_name" name="emergency_contact_name" value="{{ profile.emergency_contact_name }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="emergency_contact_phone" class="form-label">Contact Phone</label>
+                                    <input type="tel" class="form-control" id="emergency_contact_phone" name="emergency_contact_phone" value="{{ profile.emergency_contact_phone }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Status (Read-only) -->
+                        <h6 class="mb-3 mt-4">Account Status</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Shares Owned</label>
+                                    <div class="form-control-plaintext">
+                                        <span class="badge" style="background-color: 
+                                            {% if profile.shares_owned <= 20 %}#dc3545{% elif profile.shares_owned < 25 %}#ffc107{% else %}#28a745{% endif %};">
+                                            {{ profile.shares_owned }} shares
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Status</label>
+                                    <div class="form-control-plaintext">
+                                        <span class="badge {% if profile.status == 'active' %}bg-success{% elif profile.status == 'inactive' %}bg-danger{% else %}bg-warning{% endif %}">
+                                            {{ profile.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
