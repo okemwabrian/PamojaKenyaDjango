@@ -1,0 +1,296 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Application Details - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+                <div>
+                    <h1 class="h3 mb-1">📋 Application Details</h1>
+                    <p class="text-muted mb-0">Review your submitted application information</p>
+                </div>
+                <div class="mt-2 mt-md-0">
+                    <a href="{% url 'my_applications' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Applications
+                    </a>
+                    <button class="btn btn-primary btn-sm ms-2" onclick="window.print()">
+                        <i class="bi bi-printer me-1"></i>Print
+                    </button>
+                </div>
+            </div>
+
+            <!-- Application Status -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 class="mb-1">Application Status</h5>
+                                    <p class="text-muted mb-0">Submitted on {{ application.created_at|date:"F d, Y \a\t g:i A" }}</p>
+                                </div>
+                                <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                                    <span class="badge fs-6 px-3 py-2 
+                                        {% if application.status == 'approved' %}bg-success
+                                        {% elif application.status == 'rejected' %}bg-danger
+                                        {% elif application.status == 'under_review' %}bg-warning text-dark
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ application.get_status_display }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Application Information -->
+            <div class="row">
+                <!-- Personal Information -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="bi bi-person-fill me-2"></i>Personal Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Full Name</label>
+                                    <p class="mb-0 fw-semibold">{{ application.first_name }} {{ application.middle_name|default:"" }} {{ application.last_name }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Email Address</label>
+                                    <p class="mb-0">{{ application.email }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Phone Number</label>
+                                    <p class="mb-0">{{ application.phone_main|default:"Not provided" }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Address</label>
+                                    <p class="mb-0">{{ application.address|default:"Not provided" }}</p>
+                                </div>
+                                {% if application.application_type == 'double' %}
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">City, State, ZIP</label>
+                                    <p class="mb-0">{{ application.city|default:"" }} {{ application.state_province|default:"" }} {{ application.zip_postal|default:"" }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Family Information -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0"><i class="bi bi-people-fill me-2"></i>Family Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                {% if application.spouse %}
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Spouse</label>
+                                    <p class="mb-0">{{ application.spouse }}</p>
+                                    {% if application.spouse_phone %}
+                                    <small class="text-muted">Phone: {{ application.spouse_phone }}</small>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                {% if application.authorized_rep %}
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Authorized Representative</label>
+                                    <p class="mb-0">{{ application.authorized_rep }}</p>
+                                </div>
+                                {% endif %}
+
+                                <!-- Children -->
+                                {% if application.child_1 or application.child_2 or application.child_3 or application.child_4 or application.child_5 %}
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Children</label>
+                                    <ul class="list-unstyled mb-0">
+                                        {% if application.child_1 %}<li>• {{ application.child_1 }}</li>{% endif %}
+                                        {% if application.child_2 %}<li>• {{ application.child_2 }}</li>{% endif %}
+                                        {% if application.child_3 %}<li>• {{ application.child_3 }}</li>{% endif %}
+                                        {% if application.child_4 %}<li>• {{ application.child_4 }}</li>{% endif %}
+                                        {% if application.child_5 %}<li>• {{ application.child_5 }}</li>{% endif %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+
+                                <!-- Parents -->
+                                {% if application.parent_1 or application.parent_2 %}
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Parents</label>
+                                    <ul class="list-unstyled mb-0">
+                                        {% if application.parent_1 %}<li>• {{ application.parent_1 }}</li>{% endif %}
+                                        {% if application.parent_2 %}<li>• {{ application.parent_2 }}</li>{% endif %}
+                                        {% if application.spouse_parent_1 %}<li>• {{ application.spouse_parent_1 }} (Spouse's)</li>{% endif %}
+                                        {% if application.spouse_parent_2 %}<li>• {{ application.spouse_parent_2 }} (Spouse's)</li>{% endif %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+
+                                <!-- Siblings -->
+                                {% if application.sibling_1 or application.sibling_2 or application.sibling_3 %}
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Siblings</label>
+                                    <ul class="list-unstyled mb-0">
+                                        {% if application.sibling_1 %}<li>• {{ application.sibling_1 }}</li>{% endif %}
+                                        {% if application.sibling_2 %}<li>• {{ application.sibling_2 }}</li>{% endif %}
+                                        {% if application.sibling_3 %}<li>• {{ application.sibling_3 }}</li>{% endif %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents & Agreement -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0"><i class="bi bi-file-earmark-check-fill me-2"></i>Documents & Agreement</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">ID Document</label>
+                                    {% if application.minnesota_id or application.id_document %}
+                                    <p class="mb-0">
+                                        <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                        Document uploaded
+                                        <a href="#" class="btn btn-outline-primary btn-sm ms-2" onclick="showGlobalSnackbar('Document viewing feature coming soon!', 'info')">
+                                            <i class="bi bi-eye me-1"></i>View
+                                        </a>
+                                    </p>
+                                    {% else %}
+                                    <p class="mb-0 text-muted">
+                                        <i class="bi bi-x-circle-fill text-danger me-1"></i>
+                                        No document uploaded
+                                    </p>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Constitution Agreement</label>
+                                    <p class="mb-0">
+                                        {% if application.constitution_agreed %}
+                                        <i class="bi bi-check-circle-fill text-success me-1"></i>
+                                        Agreed to Pamoja Constitution
+                                        {% else %}
+                                        <i class="bi bi-x-circle-fill text-danger me-1"></i>
+                                        Not agreed
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Type & Notes -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0"><i class="bi bi-info-circle-fill me-2"></i>Application Details</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Application Type</label>
+                                    <p class="mb-0 fw-semibold text-capitalize">
+                                        {{ application.application_type|default:"Single" }} Family Membership
+                                    </p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Application ID</label>
+                                    <p class="mb-0 font-monospace">#{{ application.id|stringformat:"05d" }}</p>
+                                </div>
+                                {% if application.admin_notes %}
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Admin Notes</label>
+                                    <div class="alert alert-light border mb-0">
+                                        {{ application.admin_notes }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Last Updated</label>
+                                    <p class="mb-0">{{ application.updated_at|date:"F d, Y \a\t g:i A" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    {% if application.status == 'pending' %}
+                    <button class="btn btn-outline-warning me-2" onclick="showGlobalSnackbar('Application editing feature coming soon!', 'info')">
+                        <i class="bi bi-pencil-square me-1"></i>Edit Application
+                    </button>
+                    {% endif %}
+                    <button class="btn btn-outline-primary me-2" onclick="downloadPDF()">
+                        <i class="bi bi-download me-1"></i>Download PDF
+                    </button>
+                    <button class="btn btn-outline-success" onclick="shareApplication()">
+                        <i class="bi bi-share me-1"></i>Share
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function downloadPDF() {
+    showGlobalSnackbar('PDF download feature coming soon!', 'info');
+}
+
+function shareApplication() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Pamoja Kenya Application',
+            text: 'My Pamoja Kenya membership application details',
+            url: window.location.href
+        }).then(() => {
+            showGlobalSnackbar('Application shared successfully!', 'success');
+        }).catch(() => {
+            copyToClipboard();
+        });
+    } else {
+        copyToClipboard();
+    }
+}
+
+function copyToClipboard() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+        showGlobalSnackbar('Application link copied to clipboard!', 'success');
+    }).catch(() => {
+        showGlobalSnackbar('Unable to copy link', 'warning');
+    });
+}
+
+// Print styles
+const printStyles = `
+    @media print {
+        .btn, .card-header { print-color-adjust: exact; }
+        .container-fluid { max-width: 100%; }
+        .card { break-inside: avoid; }
+    }
+`;
+const styleSheet = document.createElement("style");
+styleSheet.innerText = printStyles;
+document.head.appendChild(styleSheet);
+</script>
+{% endblock %}
+{% endblock %}

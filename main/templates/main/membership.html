@@ -29,7 +29,9 @@
                         <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Share investment opportunities</li>
                     </ul>
                     
-                    <a href="{% url 'single_application' %}" class="btn btn-primary btn-lg">Apply Now</a>
+                    <a href="{% url 'single_application' %}" class="btn btn-primary btn-lg" onclick="showGlobalSnackbar('Redirecting to Single Family Application...', 'info', 2000)">
+                        <i class="bi bi-person-plus me-2"></i>Apply Now
+                    </a>
                 </div>
             </div>
         </div>
@@ -54,7 +56,9 @@
                         <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Priority support</li>
                     </ul>
                     
-                    <a href="{% url 'double_application' %}" class="btn btn-success btn-lg">Apply Now</a>
+                    <a href="{% url 'double_application' %}" class="btn btn-success btn-lg" onclick="showGlobalSnackbar('Redirecting to Double Family Application...', 'info', 2000)">
+                        <i class="bi bi-people-plus me-2"></i>Apply Now
+                    </a>
                 </div>
             </div>
         </div>
@@ -93,8 +97,12 @@
         <div class="col-12 text-center">
             <h4>Ready to Join?</h4>
             <p class="text-muted mb-4">Have questions? Contact us before applying</p>
-            <a href="{% url 'contact' %}" class="btn btn-outline-primary me-3">Contact Us</a>
-            <a href="{% url 'about' %}" class="btn btn-outline-secondary">Learn More</a>
+            <a href="{% url 'contact' %}" class="btn btn-outline-primary me-3" onclick="showGlobalSnackbar('Redirecting to contact form...', 'info', 2000)">
+                <i class="bi bi-envelope me-2"></i>Contact Us
+            </a>
+            <a href="{% url 'about' %}" class="btn btn-outline-secondary" onclick="showGlobalSnackbar('Loading about page...', 'info', 2000)">
+                <i class="bi bi-info-circle me-2"></i>Learn More
+            </a>
         </div>
     </div>
 </div>

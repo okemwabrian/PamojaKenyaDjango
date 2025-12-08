@@ -106,6 +106,15 @@
                             </a>
                         </div>
                         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <form method="post" action="{% url 'trigger_monthly_deduction' %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-warning w-100 btn-sm" onclick="return confirm('This will deduct 1 share from all users. Continue?')">
+                                    <i class="bi bi-calendar-minus d-block d-sm-inline me-sm-1"></i>
+                                    <span class="d-none d-sm-inline">Monthly</span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
                             <a href="{% url 'admin_messages' %}" class="btn btn-secondary w-100 btn-sm">
                                 <i class="bi bi-envelope d-block d-sm-inline me-sm-1"></i>
                                 <span class="d-none d-sm-inline">Messages</span>

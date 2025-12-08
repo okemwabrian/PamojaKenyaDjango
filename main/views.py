@@ -6,7 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
 from django.db import models, transaction
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse, Http404
+import os
 from django.template.loader import render_to_string
 from django.utils import timezone
 from .models import MembershipApplication, Payment, Claim, Share, ContactMessage, UserProfile, ShareDeduction, Notification, Meeting, Announcement, Message, MembershipUpgrade
@@ -169,9 +170,8 @@ def user_dashboard(request):
     claims = Claim.objects.filter(user=request.user)
     shares = Share.objects.filter(user=request.user)
     
-    # Calculate totals and update profile
-    total_shares = shares.filter(status='approved').aggregate(total=models.Sum('shares_purchased'))['total'] or 0
-    profile.shares_owned = total_shares
+    # Use profile shares_owned (which reflects deductions) instead of recalculating from Share records
+    total_shares = profile.shares_owned
     
     # Check activation/deactivation status
     if profile.shares_owned <= 20:
@@ -315,80 +315,54 @@ def claims(request):
 @login_required
 def shares(request):
     if request.method == 'POST':
-        # Create share purchase record
+        # Create payment record instead of direct share purchase
         shares_count = int(request.POST.get('shares', 0))
-        share = Share.objects.create(
+        amount = shares_count * 20  # $20 per share
+        
+        payment = Payment.objects.create(
             user=request.user,
-            shares_purchased=shares_count,
-            amount=shares_count * 20,  # $20 per share
+            payment_type='shares',
+            amount=amount,
             payment_method=request.POST.get('paymentMethod'),
             transaction_id=request.POST.get('transactionId', ''),
-            notes=request.POST.get('comments', ''),
+            description=f'Share purchase - {shares_count} shares',
             payment_proof=request.FILES.get('paymentProof')
         )
         
         # Send email notification
         send_mail(
-            'New Share Purchase',
-            f'New share purchase from {request.user.username} - {shares_count} shares',
+            'New Share Purchase Payment',
+            f'New share purchase payment from {request.user.username} - ${amount} for {shares_count} shares',
             settings.DEFAULT_FROM_EMAIL,
             [settings.DEFAULT_FROM_EMAIL],
             fail_silently=True,
         )
         
-        messages.success(request, 'Share purchase submitted successfully!')
+        messages.success(request, 'Share purchase payment submitted successfully! Admin will review and approve.')
         return redirect('shares')
     
-    # Get user's shares and check status
+    # Get user's shares and profile
     shares = Share.objects.filter(user=request.user).order_by('-created_at')
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     
-    # Update shares count from approved purchases
-    approved_shares = Share.objects.filter(user=request.user, status='approved').aggregate(
-        total=models.Sum('shares_purchased'))['total'] or 0
-    profile.shares_owned = approved_shares
-    
-    # Check activation/deactivation status
+    # Check activation/deactivation status based on current shares_owned
     if profile.shares_owned <= 20:
         if not profile.is_deactivated:
             profile.is_deactivated = True
             profile.status = 'inactive'
-            
-            # Send low shares email
-            send_mail(
-                'Account Deactivated - Low Shares Balance',
-                f'Dear {request.user.first_name},\n\nYour account has been deactivated because your shares balance ({profile.shares_owned}) is below the minimum required (20 shares).\n\nPlease purchase more shares to reactivate your account.\n\nThank you.',
-                settings.DEFAULT_FROM_EMAIL,
-                [request.user.email],
-                fail_silently=True,
-            )
-            
-            # Create notification
-            Notification.objects.create(
-                user=request.user,
-                notification_type='shares_low',
-                title='Account Deactivated - Low Shares',
-                message=f'Your account has been deactivated. Current shares: {profile.shares_owned}. Minimum required: 20 shares.'
-            )
+            profile.save()
     else:
-        # Reactivate if shares are sufficient
         if profile.is_deactivated:
             profile.is_deactivated = False
             profile.status = 'active'
-            
-            # Clear old deactivation notifications
-            Notification.objects.filter(
-                user=request.user, 
-                notification_type='shares_low', 
-                is_read=False
-            ).update(is_read=True)
-    
-    profile.save()
+            profile.save()
     
     return render(request, 'main/shares.html', {
         'shares': shares, 
         'profile': profile,
-        'shares_color': profile.get_shares_color()
+        'shares_color': profile.get_shares_color(),
+        'current_shares': profile.shares_owned,
+        'total_investment': profile.shares_owned * 20
     })
 
 @login_required
@@ -557,39 +531,35 @@ def deduct_all_shares(request):
             total_remaining = 0
             
             for profile in profiles:
-                # Recalculate current shares from approved Share records
-                current_shares = Share.objects.filter(
-                    user=profile.user, status='approved'
-                ).aggregate(total=models.Sum('shares_purchased'))['total'] or 0
-                
-                # Deduct shares
-                new_shares = max(0, current_shares - shares_to_deduct)
-                profile.shares_owned = new_shares
-                
-                # Check if user should be deactivated
-                if profile.shares_owned <= 20:
-                    profile.is_deactivated = True
-                    profile.status = 'inactive'
-                
-                profile.save()
-                total_remaining += profile.shares_owned
-                
-                # Send email to user
-                send_mail(
-                    'Shares Deducted from Your Account',
-                    f'Dear {profile.user.first_name},\n\nShares have been deducted from your account.\nReason: {reason}\nShares deducted: {shares_to_deduct}\nRemaining shares: {profile.shares_owned}\nTotal company shares remaining: {total_remaining}\n\nThank you.',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [profile.user.email],
-                    fail_silently=True,
-                )
-                
-                # Create notification
-                Notification.objects.create(
-                    user=profile.user,
-                    notification_type='shares_deducted',
-                    title='Shares Deducted',
-                    message=f'Reason: {reason}. Deducted: {shares_to_deduct} shares. Remaining: {profile.shares_owned} shares.'
-                )
+                if profile.shares_owned > 0:
+                    # Deduct shares from profile
+                    new_shares = max(0, profile.shares_owned - shares_to_deduct)
+                    profile.shares_owned = new_shares
+                    
+                    # Check if user should be deactivated
+                    if profile.shares_owned <= 20:
+                        profile.is_deactivated = True
+                        profile.status = 'inactive'
+                    
+                    profile.save()
+                    total_remaining += profile.shares_owned
+                    
+                    # Send email to user
+                    send_mail(
+                        'Shares Deducted from Your Account',
+                        f'Dear {profile.user.first_name},\n\nShares have been deducted from your account.\nReason: {reason}\nShares deducted: {shares_to_deduct}\nRemaining shares: {profile.shares_owned}\n\nThank you.',
+                        settings.DEFAULT_FROM_EMAIL,
+                        [profile.user.email],
+                        fail_silently=True,
+                    )
+                    
+                    # Create notification
+                    Notification.objects.create(
+                        user=profile.user,
+                        notification_type='shares_deducted',
+                        title='Shares Deducted',
+                        message=f'Reason: {reason}. Deducted: {shares_to_deduct} shares. Remaining: {profile.shares_owned} shares.'
+                    )
             
             # Record the deduction
             ShareDeduction.objects.create(
@@ -913,6 +883,35 @@ def review_payment(request, payment_id):
         payment.status = request.POST.get('status')
         payment.admin_notes = request.POST.get('admin_notes')
         payment.save()
+        
+        # Auto-create shares when payment is approved (1 share = $20)
+        if payment.status == 'approved':
+            shares_to_create = int(payment.amount // 20)
+            if shares_to_create > 0:
+                Share.objects.create(
+                    user=payment.user,
+                    shares_purchased=shares_to_create,
+                    amount=shares_to_create * 20,
+                    payment_method=payment.payment_method,
+                    transaction_id=payment.transaction_id,
+                    notes=f'Auto-created from payment #{payment.id}',
+                    status='approved'
+                )
+                
+                # Update user profile
+                profile, created = UserProfile.objects.get_or_create(user=payment.user)
+                total_approved_shares = Share.objects.filter(
+                    user=payment.user, status='approved'
+                ).aggregate(total=models.Sum('shares_purchased'))['total'] or 0
+                profile.shares_owned = total_approved_shares
+                
+                # Check activation status
+                if profile.shares_owned > 20 and profile.is_deactivated:
+                    profile.is_deactivated = False
+                    profile.status = 'active'
+                
+                profile.save()
+        
         messages.success(request, 'Payment updated successfully!')
         return redirect('admin_dashboard')
     
@@ -943,20 +942,6 @@ def review_share(request, share_id):
         share.status = request.POST.get('status')
         share.admin_notes = request.POST.get('admin_notes')
         share.save()
-        
-        # Update user profile if approved
-        if share.status == 'approved':
-            profile, created = UserProfile.objects.get_or_create(user=share.user)
-            total_approved_shares = Share.objects.filter(
-                user=share.user, status='approved'
-            ).aggregate(total=models.Sum('shares_purchased'))['total'] or 0
-            profile.shares_owned = total_approved_shares
-            
-            if profile.shares_owned > 20 and profile.is_deactivated:
-                profile.is_deactivated = False
-                profile.status = 'active'
-            
-            profile.save()
         
         messages.success(request, 'Share purchase updated successfully!')
         return redirect('admin_dashboard')
@@ -1235,3 +1220,34 @@ def double_application_view(request):
         messages.success(request, 'Application submitted successfully! Please proceed to payment ($200).')
         return redirect('payments')
     return render(request, 'main/double_application.html')
+
+def serve_constitution(request):
+    file_path = os.path.join(settings.MEDIA_ROOT, 'constitutions', 'PAMOJA-KENYA-BY-LAW-online.pdf')
+    try:
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as pdf_file:
+                response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+                response['Content-Length'] = os.path.getsize(file_path)
+                return response
+    except Exception:
+        pass
+    raise Http404('Constitution file not found')
+
+def constitution_page(request):
+    return render(request, 'main/constitution.html')
+
+@login_required
+def trigger_monthly_deduction(request):
+    if not request.user.is_staff:
+        messages.error(request, 'Access denied.')
+        return redirect('user_dashboard')
+    
+    if request.method == 'POST':
+        from django.core.management import call_command
+        try:
+            call_command('deduct_monthly_shares')
+            messages.success(request, 'Monthly share deduction completed successfully!')
+        except Exception as e:
+            messages.error(request, f'Error during deduction: {str(e)}')
+    
+    return redirect('admin_dashboard')

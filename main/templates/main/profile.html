@@ -19,7 +19,7 @@
 
             <div class="card">
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" enctype="multipart/form-data" onsubmit="handleProfileSubmit(event)">
                         {% csrf_token %}
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -72,10 +72,49 @@
                                 <input type="tel" class="form-control" name="emergency_contact_phone" 
                                        value="{{ profile.emergency_contact_phone|default:'' }}">
                             </div>
+                            
+                            <!-- ID Document Upload -->
+                            <div class="col-12 mt-4">
+                                <h5 class="text-primary">Identification Document</h5>
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Update ID Document</label>
+                                            <input type="file" name="id_document" class="form-control" accept="image/*,.pdf" id="profileIdUpload">
+                                            <div class="form-text">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                Upload clear photo/scan of government-issued ID (JPG, PNG, PDF - Max 5MB)
+                                            </div>
+                                            {% if profile.id_document %}
+                                            <div class="mt-2">
+                                                <div class="alert alert-info d-flex align-items-center">
+                                                    <i class="bi bi-file-earmark-check me-2"></i>
+                                                    <span>Current ID document on file</span>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary ms-auto" onclick="showGlobalSnackbar('Document viewing feature coming soon!', 'info')">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                            <div class="mt-2" id="profileFilePreview" style="display: none;">
+                                                <div class="alert alert-success d-flex align-items-center">
+                                                    <i class="bi bi-check-circle-fill me-2"></i>
+                                                    <span id="profileFileName"></span>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger ms-auto" onclick="clearProfileFile()">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="submit" class="btn btn-primary btn-lg" id="profileSubmitBtn">
+                                <i class="bi bi-person-check me-2"></i>Save Changes
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -83,4 +122,83 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+function handleProfileSubmit(event) {
+    const form = event.target;
+    const submitBtn = document.getElementById('profileSubmitBtn');
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Saving...';
+    submitBtn.disabled = true;
+    
+    // Validate required fields
+    const firstName = form.first_name.value.trim();
+    const lastName = form.last_name.value.trim();
+    const email = form.email.value.trim();
+    
+    if (!firstName || !lastName || !email) {
+        handleFormError('Please fill all required fields.');
+        submitBtn.innerHTML = '<i class="bi bi-person-check me-2"></i>Save Changes';
+        submitBtn.disabled = false;
+        event.preventDefault();
+        return false;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        handleFormError('Please enter a valid email address.');
+        submitBtn.innerHTML = '<i class="bi bi-person-check me-2"></i>Save Changes';
+        submitBtn.disabled = false;
+        event.preventDefault();
+        return false;
+    }
+    
+    // Show success message
+    setTimeout(() => {
+        showGlobalSnackbar('Profile updated successfully!', 'success', 4000);
+    }, 500);
+}
+
+// File upload handling for profile
+document.getElementById('profileIdUpload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('profileFilePreview');
+    const fileName = document.getElementById('profileFileName');
+    
+    if (file) {
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showGlobalSnackbar('File size must be less than 5MB', 'danger');
+            e.target.value = '';
+            preview.style.display = 'none';
+            return;
+        }
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+        if (!allowedTypes.includes(file.type)) {
+            showGlobalSnackbar('Please upload JPG, PNG, or PDF files only', 'danger');
+            e.target.value = '';
+            preview.style.display = 'none';
+            return;
+        }
+        
+        fileName.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        preview.style.display = 'block';
+        showGlobalSnackbar('New ID document selected for upload!', 'success');
+    } else {
+        preview.style.display = 'none';
+    }
+});
+
+function clearProfileFile() {
+    document.getElementById('profileIdUpload').value = '';
+    document.getElementById('profileFilePreview').style.display = 'none';
+    showGlobalSnackbar('File removed', 'info');
+}
+</script>
+{% endblock %}
 {% endblock %}

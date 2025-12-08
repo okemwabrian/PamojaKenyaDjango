@@ -79,7 +79,14 @@
                             <li><a class="dropdown-item" href="{% url 'shares' %}">My Shares</a></li>
                             <li><a class="dropdown-item" href="{% url 'my_claims' %}">My Claims</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            <li>
+                                <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item" style="border: none; background: none; width: 100%; text-align: left;">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
                         </ul>
                     </li>
                 {% endif %}

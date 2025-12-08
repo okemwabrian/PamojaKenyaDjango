@@ -1,0 +1,217 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Constitution - Pamoja Kenya MN{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 mb-3">📋 Pamoja Kenya Constitution</h1>
+                <p class="lead text-muted">Our governing document and organizational principles</p>
+            </div>
+
+            <!-- Constitution Documents -->
+            <div class="row">
+                <!-- Main Constitution -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-file-earmark-text me-2"></i>
+                                Main Constitution
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">The complete Pamoja Kenya constitution containing all rules, regulations, and organizational structure.</p>
+                            <ul class="list-unstyled mb-4">
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Membership requirements</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Rights and responsibilities</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Financial obligations</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Governance structure</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Amendment procedures</li>
+                            </ul>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" onclick="viewConstitution('main')">
+                                    <i class="bi bi-eye me-2"></i>View By-Laws
+                                </button>
+                                <button class="btn btn-outline-primary" onclick="downloadConstitution('main')">
+                                    <i class="bi bi-download me-2"></i>Download PDF
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <small><i class="bi bi-calendar me-1"></i>Last updated: December 2024</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Constitution Summary -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 border-info">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-file-earmark-text me-2"></i>
+                                Constitution Summary
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">A condensed version highlighting the key points and essential information for quick reference.</p>
+                            <ul class="list-unstyled mb-4">
+                                <li><i class="bi bi-check-circle text-info me-2"></i>Key membership benefits</li>
+                                <li><i class="bi bi-check-circle text-info me-2"></i>Essential rules</li>
+                                <li><i class="bi bi-check-circle text-info me-2"></i>Quick reference guide</li>
+                                <li><i class="bi bi-check-circle text-info me-2"></i>Important deadlines</li>
+                                <li><i class="bi bi-check-circle text-info me-2"></i>Contact information</li>
+                            </ul>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-info" onclick="viewConstitution('summary')" disabled>
+                                    <i class="bi bi-eye me-2"></i>View Summary
+                                </button>
+                                <button class="btn btn-outline-info" onclick="downloadConstitution('summary')" disabled>
+                                    <i class="bi bi-download me-2"></i>Download PDF
+                                </button>
+                            </div>
+                            <small class="text-muted">Coming soon</small>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <small><i class="bi bi-calendar me-1"></i>Available soon</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Swahili Version -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 border-warning">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="bi bi-translate me-2"></i>
+                                Katiba (Kiswahili)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">The constitution translated into Swahili for our Kenyan community members.</p>
+                            <ul class="list-unstyled mb-4">
+                                <li><i class="bi bi-check-circle text-warning me-2"></i>Mahitaji ya uanachama</li>
+                                <li><i class="bi bi-check-circle text-warning me-2"></i>Haki na majukumu</li>
+                                <li><i class="bi bi-check-circle text-warning me-2"></i>Majukumu ya kifedha</li>
+                                <li><i class="bi bi-check-circle text-warning me-2"></i>Muundo wa utawala</li>
+                                <li><i class="bi bi-check-circle text-warning me-2"></i>Taratibu za marekebisho</li>
+                            </ul>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-warning text-dark" onclick="viewConstitution('swahili')" disabled>
+                                    <i class="bi bi-eye me-2"></i>Ona Katiba
+                                </button>
+                                <button class="btn btn-outline-warning" onclick="downloadConstitution('swahili')" disabled>
+                                    <i class="bi bi-download me-2"></i>Pakua PDF
+                                </button>
+                            </div>
+                            <small class="text-muted">Coming soon</small>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <small><i class="bi bi-calendar me-1"></i>Itapatikana hivi karibuni</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bylaws -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 border-secondary">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-file-earmark-ruled me-2"></i>
+                                Organization Bylaws
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Detailed operational procedures and administrative guidelines for the organization.</p>
+                            <ul class="list-unstyled mb-4">
+                                <li><i class="bi bi-check-circle text-secondary me-2"></i>Meeting procedures</li>
+                                <li><i class="bi bi-check-circle text-secondary me-2"></i>Voting protocols</li>
+                                <li><i class="bi bi-check-circle text-secondary me-2"></i>Committee structures</li>
+                                <li><i class="bi bi-check-circle text-secondary me-2"></i>Financial procedures</li>
+                                <li><i class="bi bi-check-circle text-secondary me-2"></i>Disciplinary actions</li>
+                            </ul>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-secondary" onclick="viewConstitution('bylaws')">
+                                    <i class="bi bi-eye me-2"></i>View Bylaws
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="downloadConstitution('bylaws')">
+                                    <i class="bi bi-download me-2"></i>Download PDF
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <small><i class="bi bi-calendar me-1"></i>Available soon</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h4 class="text-center mb-4">Important Information</h4>
+                            <div class="row">
+                                <div class="col-md-4 text-center mb-3">
+                                    <i class="bi bi-info-circle display-4 text-primary mb-3"></i>
+                                    <h5>Constitution Agreement</h5>
+                                    <p class="text-muted">All members must read and agree to the constitution during the application process.</p>
+                                </div>
+                                <div class="col-md-4 text-center mb-3">
+                                    <i class="bi bi-arrow-clockwise display-4 text-success mb-3"></i>
+                                    <h5>Regular Updates</h5>
+                                    <p class="text-muted">The constitution is reviewed annually and updated as needed to serve our community better.</p>
+                                </div>
+                                <div class="col-md-4 text-center mb-3">
+                                    <i class="bi bi-question-circle display-4 text-info mb-3"></i>
+                                    <h5>Questions?</h5>
+                                    <p class="text-muted">Contact us if you have any questions about the constitution or need clarification.</p>
+                                </div>
+                            </div>
+                            <div class="text-center mt-4">
+                                <a href="{% url 'contact' %}" class="btn btn-primary me-3">
+                                    <i class="bi bi-envelope me-2"></i>Contact Us
+                                </a>
+                                <a href="{% url 'membership' %}" class="btn btn-outline-primary">
+                                    <i class="bi bi-person-plus me-2"></i>Apply for Membership
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function viewConstitution(type) {
+    if (type === 'main' || type === 'bylaws') {
+        window.open('/serve-constitution/', '_blank');
+        showGlobalSnackbar('Opening Pamoja Kenya By-Laws...', 'info', 2000);
+    } else {
+        showGlobalSnackbar('Document not yet available', 'warning');
+    }
+}
+
+function downloadConstitution(type) {
+    if (type === 'main' || type === 'bylaws') {
+        const link = document.createElement('a');
+        link.href = '/serve-constitution/';
+        link.download = 'Pamoja_Kenya_By_Laws.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showGlobalSnackbar('By-Laws downloaded successfully!', 'success');
+    } else {
+        showGlobalSnackbar('Document not yet available for download', 'warning');
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

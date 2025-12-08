@@ -21,7 +21,7 @@
                         {% endfor %}
                     {% endif %}
 
-                    <form method="post">
+                    <form method="post" onsubmit="handleContactSubmit(event)">
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="name" class="form-label fw-semibold">
@@ -68,7 +68,7 @@
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
                                 <i class="bi bi-send me-2"></i>Send Email
                             </button>
                         </div>
@@ -85,4 +85,49 @@
         </div>
     </div>
 </div>
+
+<script>
+function handleContactSubmit(event) {
+    const form = event.target;
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Sending...';
+    submitBtn.disabled = true;
+    
+    // Validate form
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const phone = form.phone.value.trim();
+    const subject = form.subject.value.trim();
+    const message = form.message.value.trim();
+    
+    if (!name || !email || !phone || !subject || message.length < 10) {
+        handleFormError('Please fill all required fields correctly.');
+        submitBtn.innerHTML = '<i class="bi bi-send me-2"></i>Send Email';
+        submitBtn.disabled = false;
+        event.preventDefault();
+        return false;
+    }
+    
+    // Show success message (will be replaced by server response)
+    setTimeout(() => {
+        showGlobalSnackbar('Message sent successfully! We\'ll respond within 24 hours.', 'success', 5000);
+    }, 500);
+}
+
+// Character counter for message field
+document.getElementById('message').addEventListener('input', function() {
+    const maxLength = 1000;
+    const currentLength = this.value.length;
+    const counter = document.querySelector('.form-text small:last-child');
+    counter.textContent = `${currentLength}/${maxLength} characters`;
+    
+    if (currentLength > maxLength * 0.9) {
+        counter.classList.add('text-warning');
+    } else {
+        counter.classList.remove('text-warning');
+    }
+});
+</script>
 {% endblock %}

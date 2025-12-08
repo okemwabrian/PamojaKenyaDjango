@@ -280,7 +280,91 @@
     
     {% block content %}{% endblock %}
     
+    <!-- Global Snackbar -->
+    <div id="globalSnackbar" class="position-fixed bottom-0 start-50 translate-middle-x mb-3" style="z-index: 1055; display: none; min-width: 300px; max-width: 90vw;">
+        <div class="alert alert-success alert-dismissible fade show shadow-lg" role="alert">
+            <i class="bi bi-check-circle-fill me-2" id="snackbarIcon"></i>
+            <span id="globalSnackbarMessage"></span>
+            <button type="button" class="btn-close" onclick="hideGlobalSnackbar()"></button>
+        </div>
+    </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Global Snackbar Script -->
+    <script>
+        function showGlobalSnackbar(message, type = 'success', duration = 4000) {
+            const snackbar = document.getElementById('globalSnackbar');
+            const alert = snackbar.querySelector('.alert');
+            const messageSpan = document.getElementById('globalSnackbarMessage');
+            const icon = document.getElementById('snackbarIcon');
+            
+            // Icon mapping
+            const icons = {
+                'success': 'bi-check-circle-fill',
+                'info': 'bi-info-circle-fill',
+                'warning': 'bi-exclamation-triangle-fill',
+                'danger': 'bi-x-circle-fill',
+                'primary': 'bi-star-fill'
+            };
+            
+            // Update alert class and icon
+            alert.className = `alert alert-${type} alert-dismissible fade show shadow-lg`;
+            icon.className = `${icons[type] || icons.success} me-2`;
+            messageSpan.textContent = message;
+            
+            // Show snackbar
+            snackbar.style.display = 'block';
+            
+            // Auto-hide after duration
+            setTimeout(() => {
+                hideGlobalSnackbar();
+            }, duration);
+        }
+        
+        function hideGlobalSnackbar() {
+            const snackbar = document.getElementById('globalSnackbar');
+            snackbar.style.display = 'none';
+        }
+        
+        // Form submission success handler
+        function handleFormSuccess(formType, action = 'submitted') {
+            const messages = {
+                'contact': `Contact form ${action} successfully!`,
+                'claim': `Claim ${action} successfully!`,
+                'payment': `Payment ${action} successfully!`,
+                'share': `Share ${action} successfully!`,
+                'application': `Application ${action} successfully!`,
+                'profile': `Profile ${action} successfully!`,
+                'meeting': `Meeting ${action} successfully!`,
+                'announcement': `Announcement ${action} successfully!`
+            };
+            
+            showGlobalSnackbar(messages[formType] || `Form ${action} successfully!`, 'success');
+        }
+        
+        // Form validation error handler
+        function handleFormError(message = 'Please check your input and try again.') {
+            showGlobalSnackbar(message, 'danger');
+        }
+        
+        // Generic action feedback
+        function showActionFeedback(action, type = 'success') {
+            const actionMessages = {
+                'saved': 'Changes saved successfully!',
+                'deleted': 'Item deleted successfully!',
+                'updated': 'Updated successfully!',
+                'created': 'Created successfully!',
+                'uploaded': 'File uploaded successfully!',
+                'downloaded': 'Download started!',
+                'copied': 'Copied to clipboard!',
+                'sent': 'Message sent successfully!'
+            };
+            
+            showGlobalSnackbar(actionMessages[action] || action, type);
+        }
+    </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>

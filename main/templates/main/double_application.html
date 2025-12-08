@@ -76,14 +76,18 @@
                     <input type="text" class="form-control" name="authorized_rep">
                 </div>
                 
-                <!-- Children -->
-                <div class="col-12"><h5>Children</h5></div>
-                {% for i in "12345" %}
-                <div class="col-md-6">
-                    <label class="form-label">Child {{ i }}</label>
-                    <input type="text" class="form-control" name="child_{{ i }}">
+                <!-- Children Section -->
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-info mb-0">Children</h5>
+                        <button type="button" class="btn btn-outline-info btn-sm" id="addChildBtn">
+                            <i class="bi bi-plus-circle"></i> Add Child
+                        </button>
+                    </div>
+                    <div id="childrenContainer" class="border rounded p-3 bg-light">
+                        <p class="text-muted text-center" id="noChildrenMsg">No children added yet. Click "Add Child" to add children.</p>
+                    </div>
                 </div>
-                {% endfor %}
                 
                 <!-- Parents -->
                 <div class="col-12"><h5>Parents (Both Sides)</h5></div>
@@ -104,34 +108,66 @@
                     <input type="text" class="form-control" name="spouse_parent_2">
                 </div>
                 
-                <!-- Siblings -->
-                <div class="col-12"><h5>Siblings</h5></div>
-                <div class="col-md-4">
-                    <label class="form-label">Sibling 1</label>
-                    <input type="text" class="form-control" name="sibling_1">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Sibling 2</label>
-                    <input type="text" class="form-control" name="sibling_2">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Sibling 3</label>
-                    <input type="text" class="form-control" name="sibling_3">
+                <!-- Siblings Section -->
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-warning mb-0">Siblings</h5>
+                        <button type="button" class="btn btn-outline-warning btn-sm" id="addSiblingBtn">
+                            <i class="bi bi-plus-circle"></i> Add Sibling
+                        </button>
+                    </div>
+                    <div id="siblingsContainer" class="border rounded p-3 bg-light">
+                        <p class="text-muted text-center" id="noSiblingsMsg">No siblings added yet. Click "Add Sibling" to add siblings.</p>
+                    </div>
                 </div>
 
-                <!-- ID Document -->
-                <div class="col-12"><h4>Identification Document</h4></div>
-                <div class="col-12">
-                    <label class="form-label">Minnesota ID or Valid ID *</label>
-                    <input type="file" class="form-control" name="id_document" accept="image/*,.pdf" required>
-                    <div class="form-text">Upload clear photo/scan of government-issued ID (JPG, PNG, PDF - Max 5MB)</div>
+                <!-- Identification Document -->
+                <div class="col-12 mt-4">
+                    <h4 class="text-primary">Identification Document</h4>
+                    <div class="card border-primary">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Minnesota ID or Valid ID *</label>
+                                <input type="file" class="form-control" name="id_document" accept="image/*,.pdf" required id="doubleIdUpload">
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Upload clear photo/scan of government-issued ID (JPG, PNG, PDF - Max 5MB)
+                                </div>
+                                <div class="mt-2" id="doubleFilePreview" style="display: none;">
+                                    <div class="alert alert-success d-flex align-items-center">
+                                        <i class="bi bi-check-circle-fill me-2"></i>
+                                        <span id="doubleFileName"></span>
+                                        <button type="button" class="btn btn-sm btn-outline-danger ms-auto" onclick="clearDoubleFile()">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Agreement -->
-                <div class="col-12">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="constitution_agreed" required>
-                        <label class="form-check-label">I have read the Pamoja Constitution and agree to the conditions *</label>
+                <!-- Constitution Agreement -->
+                <div class="col-12 mt-4">
+                    <h4 class="text-success">Agreement</h4>
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="constitution_agreed" id="doubleConstitutionAgreed" required>
+                                <label class="form-check-label fw-bold" for="doubleConstitutionAgreed">
+                                    <i class="bi bi-file-text me-2"></i>
+                                    I have read the Pamoja Kenya By-Laws and agree to the conditions *
+                                </label>
+                            </div>
+                            <div class="mt-3">
+                                <a href="#" class="btn btn-outline-primary btn-sm" onclick="showConstitution()">
+                                    <i class="bi bi-eye me-1"></i>View By-Laws
+                                </a>
+                                <a href="#" class="btn btn-outline-secondary btn-sm ms-2" onclick="downloadConstitution()">
+                                    <i class="bi bi-download me-1"></i>Download PDF
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -142,4 +178,178 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+let childCount = 0;
+let siblingCount = 0;
+
+// Add Child functionality
+document.getElementById('addChildBtn').addEventListener('click', function() {
+    childCount++;
+    const container = document.getElementById('childrenContainer');
+    const noChildrenMsg = document.getElementById('noChildrenMsg');
+    
+    if (noChildrenMsg) {
+        noChildrenMsg.style.display = 'none';
+    }
+    
+    const childDiv = document.createElement('div');
+    childDiv.className = 'card mb-3 border-info';
+    childDiv.innerHTML = `
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Child ${childCount}</h6>
+            <button type="button" class="btn btn-sm btn-outline-light" onclick="removeChild(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="child_${childCount}_name" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Age</label>
+                    <input type="number" name="child_${childCount}_age" class="form-control">
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(childDiv);
+    showGlobalSnackbar(`Child ${childCount} added successfully!`, 'info');
+});
+
+// Add Sibling functionality
+document.getElementById('addSiblingBtn').addEventListener('click', function() {
+    siblingCount++;
+    const container = document.getElementById('siblingsContainer');
+    const noSiblingsMsg = document.getElementById('noSiblingsMsg');
+    
+    if (noSiblingsMsg) {
+        noSiblingsMsg.style.display = 'none';
+    }
+    
+    const siblingDiv = document.createElement('div');
+    siblingDiv.className = 'card mb-3 border-warning';
+    siblingDiv.innerHTML = `
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Sibling ${siblingCount}</h6>
+            <button type="button" class="btn btn-sm btn-outline-dark" onclick="removeSibling(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="sibling_${siblingCount}_name" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" name="sibling_${siblingCount}_phone" class="form-control">
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(siblingDiv);
+    showGlobalSnackbar(`Sibling ${siblingCount} added successfully!`, 'warning');
+});
+
+function removeChild(button) {
+    const childDiv = button.closest('.card');
+    const childNumber = childDiv.querySelector('h6').textContent;
+    childDiv.remove();
+    
+    const container = document.getElementById('childrenContainer');
+    const noChildrenMsg = document.getElementById('noChildrenMsg');
+    
+    if (container.children.length === 1) {
+        noChildrenMsg.style.display = 'block';
+    }
+    
+    showGlobalSnackbar(`${childNumber} removed successfully!`, 'danger');
+}
+
+function removeSibling(button) {
+    const siblingDiv = button.closest('.card');
+    const siblingNumber = siblingDiv.querySelector('h6').textContent;
+    siblingDiv.remove();
+    
+    const container = document.getElementById('siblingsContainer');
+    const noSiblingsMsg = document.getElementById('noSiblingsMsg');
+    
+    if (container.children.length === 1) {
+        noSiblingsMsg.style.display = 'block';
+    }
+    
+    showGlobalSnackbar(`${siblingNumber} removed successfully!`, 'danger');
+}
+
+// File upload handling for double application
+document.getElementById('doubleIdUpload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('doubleFilePreview');
+    const fileName = document.getElementById('doubleFileName');
+    
+    if (file) {
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showGlobalSnackbar('File size must be less than 5MB', 'danger');
+            e.target.value = '';
+            preview.style.display = 'none';
+            return;
+        }
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+        if (!allowedTypes.includes(file.type)) {
+            showGlobalSnackbar('Please upload JPG, PNG, or PDF files only', 'danger');
+            e.target.value = '';
+            preview.style.display = 'none';
+            return;
+        }
+        
+        fileName.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        preview.style.display = 'block';
+        showGlobalSnackbar('ID document uploaded successfully!', 'success');
+    } else {
+        preview.style.display = 'none';
+    }
+});
+
+function clearDoubleFile() {
+    document.getElementById('doubleIdUpload').value = '';
+    document.getElementById('doubleFilePreview').style.display = 'none';
+    showGlobalSnackbar('File removed', 'info');
+}
+
+function showConstitution() {
+    window.open('/serve-constitution/', '_blank');
+    showGlobalSnackbar('Opening Pamoja Kenya By-Laws...', 'info', 2000);
+}
+
+function downloadConstitution() {
+    const link = document.createElement('a');
+    link.href = '/serve-constitution/';
+    link.download = 'Pamoja_Kenya_By_Laws.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showGlobalSnackbar('By-Laws downloaded successfully!', 'success');
+}
+
+function downloadConstitution() {
+    const link = document.createElement('a');
+    link.href = '/media/constitutions/PAMOJA-KENYA-BY-LAW-online.pdf';
+    link.download = 'Pamoja_Kenya_By_Laws.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showGlobalSnackbar('By-Laws downloaded successfully!', 'success');
+}
+</script>
+{% endblock %}
 {% endblock %}

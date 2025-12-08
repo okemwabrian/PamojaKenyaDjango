@@ -67,7 +67,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" enctype="multipart/form-data" onsubmit="handleShareSubmit(event)">
                         {% csrf_token %}
                         <div class="mb-4">
                             <label for="fullName" class="form-label">Full Name</label>
@@ -137,7 +137,7 @@
                         </div>
 
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <button type="submit" class="btn btn-primary btn-lg px-5" id="shareSubmitBtn">
                                 <i class="bi bi-cart-plus me-2"></i>
                                 Submit Share Purchase
                             </button>
@@ -201,6 +201,61 @@ document.getElementById('shares').addEventListener('input', function() {
     const shares = this.value || 0;
     const total = (shares * 20).toFixed(2);
     document.getElementById('totalAmount').textContent = '$' + total;
+    
+    if (shares > 0) {
+        showGlobalSnackbar(`Total: $${total} for ${shares} share${shares > 1 ? 's' : ''}`, 'info', 2000);
+    }
 });
+
+function handleShareSubmit(event) {
+    const form = event.target;
+    const submitBtn = document.getElementById('shareSubmitBtn');
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing...';
+    submitBtn.disabled = true;
+    
+    // Validate form
+    const fullName = form.fullName.value.trim();
+    const email = form.email.value.trim();
+    const shares = parseInt(form.shares.value);
+    const paymentMethod = form.paymentMethod.value;
+    const paymentProof = form.paymentProof.files[0];
+    
+    if (!fullName || !email || !shares || shares <= 0 || !paymentMethod || !paymentProof) {
+        handleFormError('Please fill all required fields and upload payment proof.');
+        submitBtn.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Submit Share Purchase';
+        submitBtn.disabled = false;
+        event.preventDefault();
+        return false;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        handleFormError('Please enter a valid email address.');
+        submitBtn.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Submit Share Purchase';
+        submitBtn.disabled = false;
+        event.preventDefault();
+        return false;
+    }
+    
+    // Validate file size (5MB max)
+    if (paymentProof.size > 5 * 1024 * 1024) {
+        handleFormError('File size must be less than 5MB.');
+        submitBtn.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Submit Share Purchase';
+        submitBtn.disabled = false;
+        event.preventDefault();
+        return false;
+    }
+    
+    // Show success message
+    const total = (shares * 20).toFixed(2);
+    setTimeout(() => {
+        showGlobalSnackbar(`Share purchase of ${shares} shares ($${total}) submitted successfully! Awaiting approval.`, 'success', 5000);
+        form.reset();
+        document.getElementById('totalAmount').textContent = '$0.00';
+    }, 500);
+}
 </script>
 {% endblock %}

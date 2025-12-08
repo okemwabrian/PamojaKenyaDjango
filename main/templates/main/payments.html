@@ -28,7 +28,7 @@
                         {% endfor %}
                     {% endif %}
 
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" enctype="multipart/form-data" onsubmit="handlePaymentSubmit(event)">
                         {% csrf_token %}
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -89,8 +89,12 @@
                             </div>
                             
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary">Submit Payment</button>
-                                <button type="button" class="btn btn-secondary ms-2" onclick="toggleForm()">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="paymentSubmitBtn">
+                                    <i class="bi bi-credit-card me-2"></i>Submit Payment
+                                </button>
+                                <button type="button" class="btn btn-secondary ms-2" onclick="toggleForm()">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -153,11 +157,52 @@ function toggleForm() {
         form.style.display = 'block';
         list.style.display = 'none';
         toggleText.textContent = 'View My Payments';
+        showGlobalSnackbar('Fill out the payment form and upload proof of payment', 'info', 3000);
     } else {
         form.style.display = 'none';
         list.style.display = 'block';
         toggleText.textContent = '+ Submit Payment';
     }
+}
+
+function handlePaymentSubmit(event) {
+    const form = event.target;
+    const submitBtn = document.getElementById('paymentSubmitBtn');
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing...';
+    submitBtn.disabled = true;
+    
+    // Validate form
+    const paymentType = form.payment_type.value;
+    const amount = parseFloat(form.amount.value);
+    const paymentMethod = form.payment_method.value;
+    const paymentProof = form.payment_proof.files[0];
+    
+    if (!paymentType || !amount || amount <= 0 || !paymentMethod || !paymentProof) {
+        handleFormError('Please fill all required fields and upload payment proof.');
+        submitBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i>Submit Payment';
+        submitBtn.disabled = false;
+        event.preventDefault();
+        return false;
+    }
+    
+    // Validate file size (5MB max)
+    if (paymentProof.size > 5 * 1024 * 1024) {
+        handleFormError('File size must be less than 5MB.');
+        submitBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i>Submit Payment';
+        submitBtn.disabled = false;
+        event.preventDefault();
+        return false;
+    }
+    
+    // Show success message
+    setTimeout(() => {
+        showGlobalSnackbar('Payment submitted successfully! It will be reviewed within 24 hours.', 'success', 5000);
+        toggleForm();
+        form.reset();
+        document.getElementById('paymentInstructions').style.display = 'none';
+    }, 500);
 }
 
 function updateAmount(select) {
@@ -170,6 +215,10 @@ function updateAmount(select) {
         'other': ''
     };
     amount.value = amounts[select.value] || '';
+    
+    if (amounts[select.value]) {
+        showGlobalSnackbar(`Amount set to $${amounts[select.value]}`, 'info', 2000);
+    }
 }
 
 function showInstructions(select) {

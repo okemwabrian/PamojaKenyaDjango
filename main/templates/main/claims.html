@@ -17,7 +17,7 @@
                     <h4>Submit New Claim</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" enctype="multipart/form-data" onsubmit="handleClaimSubmit(event)">
                         {% csrf_token %}
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -63,8 +63,12 @@
                                 <div class="form-text">Upload relevant documents (medical bills, certificates, etc.)</div>
                             </div>
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary">Submit Claim</button>
-                                <button type="button" class="btn btn-secondary ms-2" onclick="toggleForm()">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="claimSubmitBtn">
+                                    <i class="bi bi-file-earmark-plus me-2"></i>Submit Claim
+                                </button>
+                                <button type="button" class="btn btn-secondary ms-2" onclick="toggleForm()">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -91,10 +95,53 @@ function toggleForm() {
     if (form.style.display === 'none') {
         form.style.display = 'block';
         list.style.display = 'none';
+        showGlobalSnackbar('Fill out the form to submit your claim', 'info', 3000);
     } else {
         form.style.display = 'none';
         list.style.display = 'block';
     }
+}
+
+function handleClaimSubmit(event) {
+    const form = event.target;
+    const submitBtn = document.getElementById('claimSubmitBtn');
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Submitting...';
+    submitBtn.disabled = true;
+    
+    // Validate form
+    const claimType = form.claim_type.value;
+    const memberName = form.member_name.value.trim();
+    const relationship = form.relationship.value;
+    const incidentDate = form.incident_date.value;
+    const amount = form.amount_requested.value;
+    const description = form.description.value.trim();
+    
+    if (!claimType || !memberName || !relationship || !incidentDate || !amount || description.length < 10) {
+        handleFormError('Please fill all required fields correctly.');
+        submitBtn.innerHTML = '<i class="bi bi-file-earmark-plus me-2"></i>Submit Claim';
+        submitBtn.disabled = false;
+        event.preventDefault();
+        return false;
+    }
+    
+    // Validate date (not in future)
+    const today = new Date().toISOString().split('T')[0];
+    if (incidentDate > today) {
+        handleFormError('Incident date cannot be in the future.');
+        submitBtn.innerHTML = '<i class="bi bi-file-earmark-plus me-2"></i>Submit Claim';
+        submitBtn.disabled = false;
+        event.preventDefault();
+        return false;
+    }
+    
+    // Show success message
+    setTimeout(() => {
+        showGlobalSnackbar('Claim submitted successfully! You will receive a confirmation email shortly.', 'success', 5000);
+        toggleForm();
+        form.reset();
+    }, 500);
 }
 </script>
 {% endblock %}

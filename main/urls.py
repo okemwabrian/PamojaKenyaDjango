@@ -61,4 +61,7 @@ urlpatterns = [
     path('admin-create-notification/', views.admin_create_notification, name='admin_create_notification'),
     path('reply-message/<int:message_id>/', views.reply_message, name='reply_message'),
     path('user-profile/', views.user_profile, name='user_profile'),
+    path('constitution/', views.constitution_page, name='constitution'),
+    path('serve-constitution/', views.serve_constitution, name='serve_constitution'),
+    path('trigger-monthly-deduction/', views.trigger_monthly_deduction, name='trigger_monthly_deduction'),
 ]

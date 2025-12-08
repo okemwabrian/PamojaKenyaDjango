@@ -104,6 +104,7 @@ class Claim(models.Model):
         ('medical', 'Medical Emergency'),
         ('education', 'Education Support'),
         ('emergency', 'Emergency Assistance'),
+        
     ]
     
     RELATIONSHIPS = [
