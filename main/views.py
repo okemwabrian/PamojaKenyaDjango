@@ -505,7 +505,7 @@ def upgrade(request):
         messages.success(request, 'Upgrade request submitted successfully! Admin will review and contact you.')
         return redirect('upgrade')
     
-    # Get user's upgrade requests
+    # Get user's upgrade requests/ if he/she wants to upgrade from single to double
     upgrade_requests = MembershipUpgrade.objects.filter(user=request.user).order_by('-created_at')
     
     context = {
@@ -526,17 +526,17 @@ def deduct_all_shares(request):
         shares_to_deduct = int(request.POST.get('shares_to_deduct', 0))
         
         with transaction.atomic():
-            # Get all users with shares
+            # Get all users with shares and activate them accordingly, also here we are supposed to acuire some slight changes maybe.
             profiles = UserProfile.objects.all()
             total_remaining = 0
             
             for profile in profiles:
                 if profile.shares_owned > 0:
-                    # Deduct shares from profile
+                    # Deduct shares from profile. if a User/aprofile shares are deducted from the admin he/she(the user will get npotified)
                     new_shares = max(0, profile.shares_owned - shares_to_deduct)
                     profile.shares_owned = new_shares
                     
-                    # Check if user should be deactivated
+                    # Check if user should be deactivated////// the user should be de activated if the shares drop below 20$
                     if profile.shares_owned <= 20:
                         profile.is_deactivated = True
                         profile.status = 'inactive'
@@ -816,6 +816,7 @@ def delete_notification(request, notification_id):
         return JsonResponse({'success': True})
     except Notification.DoesNotExist:
         return JsonResponse({'error': 'Notification not found'}, status=404)
+    #login is required for you to access the deleted messages and also
 
 @login_required
 def print_financial_report(request):
@@ -1221,7 +1222,7 @@ def double_application_view(request):
         return redirect('payments')
     return render(request, 'main/double_application.html')
 
-def serve_constitution(request):
+def serve_constitution(request):#after sending an email you will get an email with the constitution file and you can download it from there
     file_path = os.path.join(settings.MEDIA_ROOT, 'constitutions', 'PAMOJA-KENYA-BY-LAW-online.pdf')
     try:
         if os.path.exists(file_path):
@@ -1236,7 +1237,7 @@ def serve_constitution(request):
 def constitution_page(request):
     return render(request, 'main/constitution.html')
 
-@login_required
+@login_required  #one is supposed to be logged in to access the monthly deduction page and also only the admin can access it
 def trigger_monthly_deduction(request):
     if not request.user.is_staff:
         messages.error(request, 'Access denied.')
